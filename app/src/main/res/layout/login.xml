@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+            android:id="@+id/login"
+            android:textSize="24dp"
+            android:text="@string/login"
+            android:layout_width="104dp"
+            android:layout_height="32dp"
+            app:layout_editor_absoluteY="16dp"
+            app:layout_editor_absoluteX="142dp" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="24dp" android:layout_marginRight="24dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"/>
+
+    <EditText
+            android:id="@+id/user_name"
+            android:layout_width="352dp"
+            android:layout_height="42dp"
+            android:hint="@string/username"
+            app:layout_editor_absoluteY="57dp"
+            app:layout_editor_absoluteX="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/login"/>
+
+    <EditText
+            android:id="@+id/user_pwd"
+            android:hint="@string/password"
+            android:layout_width="349dp"
+            android:layout_height="38dp"
+            app:layout_editor_absoluteY="110dp"
+            app:layout_editor_absoluteX="6dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="24dp" android:layout_marginStart="24dp" android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@+id/user_name" android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar" app:layout_constraintVertical_bias="0.0"/>
+
+    <Button
+            android:id="@+id/btn_login"
+            android:text="@string/btn_login"
+            android:background="#1078F8"
+            android:layout_width="152dp"
+            android:layout_height="53dp"
+            app:layout_editor_absoluteY="196dp"
+            app:layout_editor_absoluteX="16dp" android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="16dp" android:layout_marginStart="16dp"
+            app:layout_constraintEnd_toStartOf="@+id/btn_clear" android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp" app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
+            app:layout_constraintVertical_bias="0.433"/>
+
+    <Button
+            android:id="@+id/btn_clear"
+            android:text="@string/btn_clear"
+            android:background="#1078F8"
+            android:layout_width="147dp"
+            android:layout_height="53dp"
+            app:layout_editor_absoluteY="196dp"
+            app:layout_editor_absoluteX="203dp" android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="16dp" android:layout_marginRight="16dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp" app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
+            app:layout_constraintVertical_bias="0.433"/>
+
+    <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="75dp"
+            android:layout_height="64dp"
+            android:visibility="gone"
+            app:layout_editor_absoluteY="371dp"
+            app:layout_editor_absoluteX="160dp" android:layout_marginBottom="208dp"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="24dp" android:layout_marginRight="24dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp" app:layout_constraintHorizontal_bias="0.501"/>
+
+    <TextView
+            android:id="@+id/mRegister"
+            android:text="@string/mRegister"
+            android:textColor="#FF0000"
+            android:layout_width="59dp"
+            android:layout_height="18dp"
+            app:layout_editor_absoluteY="165dp"
+            app:layout_editor_absoluteX="305dp"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="24dp" android:layout_marginStart="24dp"
+            app:layout_constraintHorizontal_bias="1.0" app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="24dp" android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@+id/user_pwd" app:layout_constraintVertical_bias="0.0"/>
+
+</android.support.constraint.ConstraintLayout>

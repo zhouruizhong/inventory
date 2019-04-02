@@ -1,0 +1,38 @@
+<resources>
+    <string name="btn_register">注册</string>
+    <string name="mRegister">点击注册</string>
+    <string name="btn_clear">清除</string>
+    <string name="mTvLogin">点击登陆</string>
+    <string name="btn_login">登陆</string>
+    <string name="login">用户登陆</string>
+    <string name="register">用户注册</string>
+    <string name="username">请输入用户名</string>
+    <string name="password">请输入密码</string>
+    <string name="title_activity_index">Index</string>
+    <string name="qrcode">二维码</string>
+    <string name="app_name">木智云</string>
+    <string name="scan_login">扫一扫登录</string>
+    <string name="logo">标志</string>
+    <string name="qr_code" translatable="false">二维码</string>
+    <string name="inventory">盘点</string>
+    <string name="clean_cache">清除缓存</string>
+    <string name="inventory_scan">盘点扫描</string>
+    <string name="scan">扫描</string>
+    <string name="upload">上传</string>
+    <string name="check_all">全选</string>
+    <string name="delete">删除</string>
+    <string name="code">编号</string>
+    <string name="count">总数量</string>
+    <string name="matched">已匹配</string>
+    <string name="scan_receipts">扫描单据</string>
+    <string name="please_input_number">请输入编号</string>
+    <string name="ok">确定</string>
+    <string name="exit">退出</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="clear">清除</string>
+    <string name="close">关闭</string>
+    <string name="title_activity_inventory">Inventory</string>
+    <string name="title_activity_scan_receipts">ScanReceipts</string>
+
+</resources>
