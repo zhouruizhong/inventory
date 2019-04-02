@@ -39,8 +39,8 @@ public class ReceiptsDaoImpl implements ReceiptsDao {
         Receipts receipts = null;
         while(cursor.moveToNext()){
             receipts = new Receipts();
-            receipts.setCount(cursor.getInt(cursor.getColumnIndex("count")));
-            receipts.setMatched(cursor.getInt(cursor.getColumnIndex("matched")));
+            receipts.setCount(cursor.getString(cursor.getColumnIndex("count")));
+            receipts.setMatched(cursor.getString(cursor.getColumnIndex("matched")));
             receipts.setNumber(cursor.getString(cursor.getColumnIndex("number")));
             receipts.setId(cursor.getInt(cursor.getColumnIndex("id")));
             list.add(receipts);

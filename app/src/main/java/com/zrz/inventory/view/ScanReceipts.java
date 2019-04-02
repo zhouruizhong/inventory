@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.app.Activity;
+import android.support.annotation.ColorInt;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.*;
 import com.zrz.inventory.R;
+import com.zrz.inventory.adapter.ViewListAdapter;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
 import com.zrz.inventory.bean.Receipts;
 import com.zrz.inventory.presenter.ReceiptsPresenter;
@@ -41,8 +43,10 @@ public class ScanReceipts extends Activity implements ViewReceipts {
      */
     private Button delete;
     private PopupWindow popupWindow;
-    private ViewPagerAdapter viewPagerAdapter;
     private ReceiptsPresenter presenter;
+    private List<Receipts> receiptsList = new ArrayList<>();
+    private ViewListAdapter viewListAdapter;
+    private Integer current_index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,7 @@ public class ScanReceipts extends Activity implements ViewReceipts {
         setContentView(R.layout.scan_receipts);
 
         initView();
+        initData();
         event();
         presenter = new ReceiptsPresenter(this, ScanReceipts.this);
     }
@@ -60,8 +65,50 @@ public class ScanReceipts extends Activity implements ViewReceipts {
         add = findViewById(R.id.add);
         checkAll = findViewById(R.id.check_all);
         delete = findViewById(R.id.delete);
+    }
 
-        List<TextView> textViews = new ArrayList<>();
+    /**
+     * 初始化数据
+     */
+    private void initData() {
+        //初始化10项数据
+        Receipts receipts = null;
+        for (int i = 1; i <= 10; i++) {
+            receipts = new Receipts();
+            receipts.setNumber("100"+i);
+            receipts.setMatched(i + "");
+            receipts.setCount(i + "");
+            receipts.setId(1);
+            receiptsList.add(receipts);
+        }
+
+        //设置ListView的适配器
+        viewListAdapter = new ViewListAdapter(this, receiptsList);
+        listView.setAdapter(viewListAdapter);
+        listView.setSelection(1);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setBackgroundColor(getResources().getColor(R.color.blue3));
+                //获取选择的项的值
+                Receipts receipts = (Receipts) parent.getItemAtPosition(position);
+                Toast.makeText(getApplicationContext(), receipts.getNumber(), Toast.LENGTH_LONG).show();
+                current_index = position;
+                viewListAdapter.notifyDataSetChanged();
+                setViewEnabled();
+            }
+        });
+
+    }
+
+    public void setViewEnabled(){
+        checkAll.setVisibility(View.VISIBLE);
+        delete.setVisibility(View.VISIBLE);
+    }
+
+    public void setViewDisEnabled(){
+        checkAll.setVisibility(View.GONE);
+        delete.setVisibility(View.GONE);
     }
 
     private void event() {
@@ -99,9 +146,9 @@ public class ScanReceipts extends Activity implements ViewReceipts {
                     }
                 });
 
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which){
+                    public void onClick(DialogInterface dialog, int which) {
                         String result = input.getText().toString().trim();
                         //    将输入的用户名和密码打印出来
                         Toast.makeText(ScanReceipts.this, "您输入的内容是： " + result, Toast.LENGTH_SHORT).show();
@@ -109,17 +156,16 @@ public class ScanReceipts extends Activity implements ViewReceipts {
                     }
                 });
 
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener(){
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which){
+                    public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
                 /**confirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(ScanReceipts.this, "您输入的内容是：" + input.getText(), Toast.LENGTH_LONG).show();
-                    }
+                @Override public void onClick(View v) {
+                Toast.makeText(ScanReceipts.this, "您输入的内容是：" + input.getText(), Toast.LENGTH_LONG).show();
+                }
                 });*/
                 builder.show();
             }
@@ -128,11 +174,11 @@ public class ScanReceipts extends Activity implements ViewReceipts {
 
     @Override
     public void successHint(Receipts receipts, String tag) {
-        Toast.makeText(this,  tag + "成功", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, tag + "成功", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void failHint(Receipts receipts, String tag) {
-        Toast.makeText(this, tag + "失败,已存在", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, tag + "失败", Toast.LENGTH_SHORT).show();
     }
 }

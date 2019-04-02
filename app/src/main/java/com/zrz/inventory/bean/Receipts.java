@@ -18,11 +18,11 @@ public class Receipts {
     /**
      *  已匹配
      */
-    private Integer matched;
+    private String matched;
     /**
      * 总数量
      */
-    private Integer count;
+    private String count;
 
     public Integer getId() {
         return id;
@@ -40,19 +40,19 @@ public class Receipts {
         this.number = number;
     }
 
-    public Integer getMatched() {
+    public String getMatched() {
         return matched;
     }
 
-    public void setMatched(Integer matched) {
+    public void setMatched(String matched) {
         this.matched = matched;
     }
 
-    public Integer getCount() {
+    public String getCount() {
         return count;
     }
 
-    public void setCount(Integer count) {
+    public void setCount(String count) {
         this.count = count;
     }
 }
