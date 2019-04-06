@@ -77,10 +77,12 @@ public class Scan extends BaseTabFragmentActivity {
         matched.setText(receipts.getMatched());
     }
 
+    @Override
     protected void initViewPageData() {
         viewPagerAdapter.notifyDataSetChanged();
     }
 
+    @Override
     protected void initViewPager() {
         //初始化10项数据
         BarCode barCode = null;

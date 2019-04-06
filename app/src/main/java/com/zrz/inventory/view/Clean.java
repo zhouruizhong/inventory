@@ -9,11 +9,13 @@ import com.zrz.inventory.R;
 import com.zrz.inventory.adapter.ViewListAdapter;
 import com.zrz.inventory.bean.Receipts;
 import com.zrz.inventory.presenter.ReceiptsPresenter;
+import com.zrz.inventory.view.viewinter.ViewReceipts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class Clean extends Activity {
+public class Clean extends Activity implements ViewReceipts {
 
     private ViewPager viewPager;
     private ListView listView;
@@ -45,6 +47,8 @@ public class Clean extends Activity {
         initData();
 
         event();
+
+        presenter = new ReceiptsPresenter(this, Clean.this);
     }
 
     private void initView() {
@@ -64,6 +68,9 @@ public class Clean extends Activity {
             receipts.setCount(i + "");
             receiptsList.add(receipts);
         }
+
+        // 查询数据
+        presenter.findAll(1, 10);
 
         //设置ListView的适配器
         viewListAdapter = new ViewListAdapter(this, receiptsList);
@@ -104,5 +111,15 @@ public class Clean extends Activity {
     public void setDisEnable(){
         checkAll.setVisibility(View.INVISIBLE);
         delete.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void successHint(Map<String, Object> response, String tag) {
+
+    }
+
+    @Override
+    public void failHint(Map<String, Object> response, String tag) {
+
     }
 }

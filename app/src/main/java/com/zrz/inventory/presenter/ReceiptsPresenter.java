@@ -3,12 +3,16 @@ package com.zrz.inventory.presenter;
 import android.content.Context;
 import android.os.Handler;
 import com.zrz.inventory.bean.Receipts;
+import com.zrz.inventory.model.OnRequestListener;
 import com.zrz.inventory.model.OnSaveListener;
 import com.zrz.inventory.model.ReceiptsInter;
 import com.zrz.inventory.model.impl.ReceiptsInterImpl;
 import com.zrz.inventory.view.viewinter.ViewReceipts;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 周瑞忠
@@ -31,8 +35,36 @@ public class ReceiptsPresenter {
         modelInter = new ReceiptsInterImpl(context);
     }
 
-    public List<Receipts> findAll(){
-        return modelInter.findAll();
+    public void findAll(Integer currentPage, Integer pageSize){
+        modelInter.findAll(currentPage, pageSize, new OnRequestListener(){
+            @Override
+            public void success(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsList", (List<Receipts>)object);
+                        viewReceipts.successHint(response,TAG);
+                    }
+                }, 3000);
+            }
+
+            @Override
+            public void fail(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("", (List<Receipts>)object);
+                        viewReceipts.successHint(response,TAG);
+                    }
+                }, 3000);
+            }
+        });
     }
 
     public void add(String number){
@@ -43,10 +75,13 @@ public class ReceiptsPresenter {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
                         Receipts receipts = new Receipts();
                         receipts.setNumber(number);
+
+                        response.put("receipts", receipts);
                         //返回成功状态信息
-                        viewReceipts.successHint(receipts,TAG);
+                        viewReceipts.successHint(response,TAG);
                     }
                 }, 3000);
             }
@@ -57,10 +92,13 @@ public class ReceiptsPresenter {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
                         Receipts receipts = new Receipts();
                         receipts.setNumber(number);
+
+                        response.put("receipts", receipts);
                         //返回失败状态信息
-                        viewReceipts.failHint(receipts,TAG);
+                        viewReceipts.failHint(response,TAG);
                     }
                 }, 3000);
             }

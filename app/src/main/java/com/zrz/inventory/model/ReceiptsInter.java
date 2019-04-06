@@ -29,5 +29,5 @@ public interface ReceiptsInter {
      *
      * @return
      */
-    List<Receipts> findAll();
+    void findAll(Integer currentPage, Integer pageSize, OnRequestListener listener);
 }

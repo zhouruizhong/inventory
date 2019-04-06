@@ -10,11 +10,13 @@ import com.zrz.inventory.dao.ReceiptsDao;
 import com.zrz.inventory.dao.UserDao;
 import com.zrz.inventory.dao.impl.ReceiptsDaoImpl;
 import com.zrz.inventory.dao.impl.UserDaoImpl;
+import com.zrz.inventory.model.OnRequestListener;
 import com.zrz.inventory.model.OnSaveListener;
 import com.zrz.inventory.model.ReceiptsInter;
 import rx.Observable;
 import rx.subscriptions.CompositeSubscription;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,7 +47,13 @@ public class ReceiptsInterImpl implements ReceiptsInter {
     }
 
     @Override
-    public List<Receipts> findAll() {
-        return receiptsDao.findAll();
+    public void findAll(OnRequestListener listener) {
+        try{
+
+            List<Receipts> receiptsList = receiptsDao.findAll();
+            listener.success(receiptsList);
+        }catch (Exception e){
+            listener.fail(new ArrayList<Receipts>());
+        }
     }
 }
