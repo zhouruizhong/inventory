@@ -5,13 +5,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".view.ScanReceipts">
+        tools:context=".view.Clean">
 
     <TextView
             android:text="@string/scan_receipts"
             android:layout_width="78dp"
             android:layout_height="23dp"
-            android:id="@+id/textView" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+            android:id="@+id/clean_receipts" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="8dp" android:layout_marginStart="8dp" app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="8dp" app:layout_constraintBottom_toBottomOf="parent"
@@ -21,25 +21,55 @@
             android:src="@mipmap/back"
             android:layout_width="19dp"
             android:layout_height="22dp"
-            android:id="@+id/scan_receipts_back" android:layout_marginTop="16dp"
+            android:id="@+id/clean_back" android:layout_marginTop="16dp"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="8dp" android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" android:layout_marginRight="8dp"
             app:layout_constraintHorizontal_bias="0.022" app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="8dp" app:layout_constraintVertical_bias="0.0"/>
-    <ImageView
-            android:src="@mipmap/add"
-            android:layout_width="22dp"
-            android:layout_height="20dp"
-            android:id="@+id/add" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="8dp" android:layout_marginStart="8dp"
-            app:layout_constraintHorizontal_bias="0.976" app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="8dp" app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="8dp" app:layout_constraintVertical_bias="0.015"/>
 
+    <Button
+            android:text="@string/check_all"
+            android:layout_width="154dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/check_all"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/delete"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.156"
+            app:layout_constraintVertical_bias="0.984"
+            android:background="@color/blue"
+            android:textColor="@android:color/white" android:textSize="18sp"/>
+    <Button
+            android:text="@string/delete"
+            android:layout_width="155dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/delete"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintHorizontal_bias="0.962"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="8dp"
+            app:layout_constraintVertical_bias="1.0"
+            android:background="@color/blue"
+            android:textColor="@android:color/white" android:textSize="18sp"/>
     <ListView
-            android:id="@+id/listView"
+            android:id="@+id/clean_listView"
             android:scrollbars="vertical"
             android:fadingEdge="vertical"
             android:overScrollMode="never"
@@ -52,5 +82,4 @@
             android:layout_marginStart="8dp" app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="8dp"
             app:layout_constraintHorizontal_bias="0.509" app:layout_constraintVertical_bias="0.357"/>
-
 </android.support.constraint.ConstraintLayout>

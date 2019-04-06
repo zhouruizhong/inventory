@@ -59,6 +59,7 @@ public class ViewListAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.receipts, null);
             viewHolder = new ViewHolder(convertView);
+            //设置内容
             convertView.setTag(viewHolder);
         } else {
             //得到缓存的布局

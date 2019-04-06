@@ -2,6 +2,7 @@ package com.zrz.inventory.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.app.Activity;
@@ -75,7 +76,7 @@ public class ScanReceipts extends Activity implements ViewReceipts {
         Receipts receipts = null;
         for (int i = 1; i <= 10; i++) {
             receipts = new Receipts();
-            receipts.setNumber("100"+i);
+            receipts.setNumber("100" + i);
             receipts.setMatched(i + "");
             receipts.setCount(i + "");
             receipts.setId(1);
@@ -86,27 +87,11 @@ public class ScanReceipts extends Activity implements ViewReceipts {
         viewListAdapter = new ViewListAdapter(this, receiptsList);
         listView.setAdapter(viewListAdapter);
         listView.setSelection(1);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                view.setBackgroundColor(getResources().getColor(R.color.blue3));
-                //获取选择的项的值
-                Receipts receipts = (Receipts) parent.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), receipts.getNumber(), Toast.LENGTH_LONG).show();
-                current_index = position;
-                viewListAdapter.notifyDataSetChanged();
-                setViewEnabled();
-            }
-        });
+
 
     }
 
-    public void setViewEnabled(){
-        checkAll.setVisibility(View.VISIBLE);
-        delete.setVisibility(View.VISIBLE);
-    }
-
-    public void setViewDisEnabled(){
+    public void setViewDisEnabled() {
         checkAll.setVisibility(View.GONE);
         delete.setVisibility(View.GONE);
     }
@@ -168,6 +153,21 @@ public class ScanReceipts extends Activity implements ViewReceipts {
                 }
                 });*/
                 builder.show();
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setBackgroundColor(getResources().getColor(R.color.blue3));
+                //获取选择的项的值
+                Receipts receipts = (Receipts) parent.getItemAtPosition(position);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("receipts",receipts);
+
+                Intent intent = new Intent(ScanReceipts.this, Scan.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }

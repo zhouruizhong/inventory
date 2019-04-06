@@ -1,11 +1,13 @@
 package com.zrz.inventory.bean;
 
+import java.io.Serializable;
+
 /**
  * @author 周瑞忠
  * @description java类作用描述
  * @date 2019/3/31 1:43
  */
-public class LoginResp {
+public class LoginResp implements Serializable {
 
     /**
      * 200表示成功

@@ -1,11 +1,13 @@
 package com.zrz.inventory.bean;
 
+import java.io.Serializable;
+
 /**
  * @author 周瑞忠
  * 单据
  * @date 2019/3/31 17:29
  */
-public class Receipts {
+public class Receipts implements Serializable {
 
     /**
      *

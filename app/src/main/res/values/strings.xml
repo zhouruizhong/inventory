@@ -34,5 +34,6 @@
     <string name="close">关闭</string>
     <string name="title_activity_inventory">Inventory</string>
     <string name="title_activity_scan_receipts">ScanReceipts</string>
+    <string name="title_activity_clean">Clean</string>
 
 </resources>

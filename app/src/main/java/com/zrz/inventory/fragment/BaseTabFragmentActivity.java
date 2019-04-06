@@ -65,11 +65,11 @@ public class BaseTabFragmentActivity extends FragmentActivity {
 	}
 
 	protected void initViewPager() {
-		mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), lstFrg, lstTitles);
+		/*mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), lstFrg, lstTitles);
 
 		mViewPager = findViewById(R.id.pager);
 		mViewPager.setAdapter(mViewPagerAdapter);
-		mViewPager.setOffscreenPageLimit(offscreenPage);
+		mViewPager.setOffscreenPageLimit(offscreenPage);*/
 	}
 
 	@Override

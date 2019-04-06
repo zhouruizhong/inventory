@@ -1,15 +1,21 @@
 package com.zrz.inventory.adapter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.zrz.inventory.R;
+import com.zrz.inventory.bean.BarCode;
+import com.zrz.inventory.bean.Receipts;
 import com.zrz.inventory.fragment.KeyDwonFragment;
 
 import java.util.ArrayList;
@@ -17,40 +23,87 @@ import java.util.List;
 
 /**
  * @author 周瑞忠
- * @description java类作用描述
  * @date 2019/3/31 17:05
  */
-public class ViewPagerAdapter extends FragmentPagerAdapter {
+public class ViewPagerAdapter extends BaseAdapter {
 
-    private List<KeyDwonFragment> lstFrg = new ArrayList<KeyDwonFragment>();
-    private List<String> lstTitles = new ArrayList<String>();
+    /**
+     * 上下文对象
+     */
+    private Context context;
+    /**
+     * ListView显示的数据
+     */
+    private List<BarCode> dataList;
 
-    public ViewPagerAdapter(FragmentManager fm, List<KeyDwonFragment> fragments, List<String> titles) {
-        super(fm);
-
-        lstFrg = fragments;
-        lstTitles = titles;
-    }
-
-
-    @Override
-    public Fragment getItem(int position) {
-        if (lstFrg.size() > 0) {
-            return lstFrg.get(position);
-        }
-        throw new IllegalStateException("No fragment at position " + position);
+    /**
+     * 构造器
+     *
+     * @param context  上下文对象
+     * @param dataList 数据
+     */
+    public ViewPagerAdapter(Context context, List<BarCode> dataList) {
+        this.context = context;
+        this.dataList = dataList;
     }
 
     @Override
     public int getCount() {
-        return lstFrg.size();
+        return dataList == null ? 0 : dataList.size();
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
-        if (lstTitles.size() > 0) {
-            return lstTitles.get(position);
+    public Object getItem(int position) {
+        return dataList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewPagerAdapter.ViewHolder viewHolder;
+        //判断是否有缓存
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.data, null);
+            viewHolder = new ViewPagerAdapter.ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        } else {
+            //得到缓存的布局
+            viewHolder = (ViewPagerAdapter.ViewHolder) convertView.getTag();
+
+            BarCode barCode = dataList.get(position);
+            //设置内容
+            viewHolder.item1.setText(barCode.getItem1());
+            viewHolder.item2.setText(barCode.getItem2());
+            viewHolder.item3.setText(barCode.getItem3());
+            viewHolder.item4.setText(barCode.getItem4());
         }
-        return null;
+        return convertView;
+    }
+
+    /**
+     * ViewHolder类
+     */
+    private final class ViewHolder {
+
+        TextView item1;
+        TextView item2;
+        TextView item3;
+        TextView item4;
+
+        /**
+         * 构造器
+         *
+         * @param view 视图组件（ListView的子项视图）
+         */
+        ViewHolder(View view) {
+            item1 = view.findViewById(R.id.item1);
+            item2 = view.findViewById(R.id.item2);
+            item3 = view.findViewById(R.id.item3);
+            item4 = view.findViewById(R.id.item4);
+        }
     }
 }

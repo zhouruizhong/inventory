@@ -29,7 +29,8 @@ public class Main extends AppCompatActivity {
         cleanCache.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(Main.this, "缓存清除成功！", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Main.this, Clean.class);
+                startActivity(intent);
             }
         });
     }

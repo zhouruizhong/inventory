@@ -1,6 +1,8 @@
 package com.zrz.inventory.view;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -89,13 +91,14 @@ public class Index extends Activity implements UuidView {
             if (code.equals(mLoginResp.getCode())){
                 Intent intent = new Intent(Index.this, Main.class);
 
-                Bundle bundle = new Bundle();
-                bundle.putCharSequence("keyName", mLoginResp.getKeyName());
-                bundle.putCharSequence("secretName", mLoginResp.getSecretName());
-                bundle.putCharSequence("token", mLoginResp.getToken());
-                bundle.putCharSequence("loginUuid", mLoginResp.getLoginUuid());
+                SharedPreferences sharedPreferences = getSharedPreferences("login", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("keyName", mLoginResp.getKeyName());
+                editor.putString("secretName", mLoginResp.getSecretName());
+                editor.putString("token", mLoginResp.getToken());
+                editor.putString("loginUuid", mLoginResp.getLoginUuid());
+                editor.commit();
 
-                intent.putExtras(bundle);
                 startActivity(intent);
             }
         }
