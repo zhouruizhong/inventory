@@ -31,7 +31,7 @@ public class ReceiptsDetailDaoImpl implements ReceiptsDetailDao {
 
         //方法二：封装的api操作，直接操作方法即可
         values = new ContentValues();
-        values.put("receiptsId", receiptsDetail.getReceiptsId());
+        values.put("receipts", receiptsDetail.getReceiptsId());
         values.put("item1", receiptsDetail.getItem1());
         values.put("item2", receiptsDetail.getItem2());
         values.put("item3", receiptsDetail.getItem3());
@@ -47,11 +47,11 @@ public class ReceiptsDetailDaoImpl implements ReceiptsDetailDao {
 //        String sql = "select * from " + DBHelper.TABLENAME + " where " + DBHelper.COLNUMNAME + " = ?";
 //        Cursor cursor = database.rawQuery(sql, new String[]{name});
         //方法二：封装的api操作，直接操作方法即可
-        Cursor cursor = database.query("receipts_detail", new String[]{"id", "receiptsId","item1","item2","item3", "item4"}, "receipts_id = ?", new String[]{receiptsId.toString()}, null, null, null, currentPage.toString() + "," + pageSize.toString());
+        Cursor cursor = database.query("receipts_detail", new String[]{"id", "receipts","item1","item2","item3", "item4"}, "receipts = ?", new String[]{receiptsId.toString()}, null, null, null, currentPage.toString() + "," + pageSize.toString());
         ReceiptsDetail detail = null;
         while(cursor.moveToNext()){
             detail = new ReceiptsDetail();
-            detail.setReceiptsId(cursor.getInt(cursor.getColumnIndex("receiptsId")));
+            detail.setReceiptsId(cursor.getInt(cursor.getColumnIndex("receipts")));
             detail.setItem1(cursor.getString(cursor.getColumnIndex("item1")));
             detail.setItem2(cursor.getString(cursor.getColumnIndex("item2")));
             detail.setItem3(cursor.getString(cursor.getColumnIndex("item3")));

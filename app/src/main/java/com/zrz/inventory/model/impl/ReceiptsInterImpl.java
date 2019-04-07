@@ -65,4 +65,33 @@ public class ReceiptsInterImpl implements ReceiptsInter {
             listener.fail(0);
         }
     }
+
+    @Override
+    public void updateCountById(Integer id, Integer count, OnRequestListener listener) {
+        try{
+            receiptsDao.updateCountById(id, count);
+            listener.success(1);
+        }catch (Exception e){
+            listener.fail(0);
+        }
+    }
+
+    @Override
+    public void updateCountById(Integer id, Integer count) {
+        try{
+            receiptsDao.updateCountById(id, count);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateMatchedById(Integer id, Integer matched, OnRequestListener listener) {
+        try{
+            receiptsDao.updateMatchedById(id, matched);
+            listener.success(1);
+        }catch (Exception e){
+            listener.fail(0);
+        }
+    }
 }

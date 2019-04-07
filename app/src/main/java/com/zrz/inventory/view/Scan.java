@@ -34,14 +34,15 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
     private int inventoryFlag = 0;
 
     private ArrayList<HashMap<String, String>> tagList;
-    SimpleAdapter adapter;
-    TextView code;
-    TextView count;
-    TextView matched;
-    RadioGroup RgInventory;
+    private SimpleAdapter adapter;
+    private TextView code;
+    private TextView count;
+    private TextView matched;
+    private RadioGroup RgInventory;
 
-    Button scan;
-    ListView LvTags;
+    private Button scan;
+    private Button upload;
+    private ListView LvTags;
     private Scan mContext = this;
     private HashMap<String, String> map;
     private EditText editText;
@@ -51,7 +52,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
     private List<ReceiptsDetail> receiptsDetails = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
     private Integer currentPage = 1;
-    private Integer pageSize = 5;
+    private Integer pageSize = 10;
     private ReceiptsDetailPresenter presenter;
     private Integer receiptsId;
 
@@ -61,7 +62,6 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
         setContentView(R.layout.scan);
 
         presenter = new ReceiptsDetailPresenter(this, Scan.this);
-
         // 初始化页面
         initView();
         initSound();
@@ -82,11 +82,12 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
         Receipts receipts = (Receipts) bundle.getSerializable("receipts");
         receiptsId = receipts.getId();
         //Toast.makeText(Scan.this, loginResp.getMessage(), Toast.LENGTH_LONG).show();
-        presenter.find(receiptsId, currentPage, pageSize);
-
         code.setText(receipts.getNumber());
         count.setText(receipts.getCount());
         matched.setText(receipts.getMatched());
+
+        presenter.find(receiptsId, currentPage, pageSize);
+
     }
 
     @Override
@@ -96,7 +97,6 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
 
     @Override
     protected void initViewPager() {
-
         //设置ListView的适配器
         viewPagerAdapter = new ViewPagerAdapter(this, receiptsDetails);
         listView.setAdapter(viewPagerAdapter);
@@ -148,6 +148,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
         matched = findViewById(R.id.matched_num);
 
         scan = findViewById(R.id.scan);
+        upload = findViewById(R.id.upload);
         listView = findViewById(R.id.list_item);
         tagList = new ArrayList<>(10);
 
@@ -162,13 +163,19 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
         });
 
         scan.setOnClickListener(new ScanClickListener());
+
+        upload.setOnClickListener(new UploadClickListener());
     }
 
     @Override
     public void successHint(Map<String, Object> response, String tag) {
         if (tag.equals("find")) {
             receiptsDetails.clear();
-            receiptsDetails.addAll((List<ReceiptsDetail>) response.get("receiptsDetailList"));
+
+            List<ReceiptsDetail> receiptsDetailList = (List<ReceiptsDetail>) response.get("receiptsDetailList");
+            receiptsDetails.addAll(receiptsDetailList);
+
+            count.setText(receiptsDetailList.size()+"");
             viewPagerAdapter.notifyDataSetChanged();
         }
         if (tag.equals("scan")){
@@ -184,6 +191,14 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
         }
     }
 
+    public class UploadClickListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+
+        }
+    }
+
     public class ScanClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -193,7 +208,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
             receiptsDetail.setItem1("item1" + (int) (Math.random() * 10 + 1));
             receiptsDetail.setItem2("item2" + (int) (Math.random() * 10 + 2));
             receiptsDetail.setItem3("item3" + (int) (Math.random() * 10 + 3));
-            receiptsDetail.setItem4("item4" + (int) (Math.random() * 10 + 4));
+            receiptsDetail.setItem4(""+System.currentTimeMillis() +""+ (Math.random() * 1000));
             presenter.add(receiptsDetail);
         }
     }

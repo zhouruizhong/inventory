@@ -18,6 +18,13 @@ public interface ReceiptsDao {
     List<Receipts> findAll(Integer currentPage, Integer pageSize);
 
     /**
+     *
+     * @param id
+     * @return
+     */
+    Receipts findById(Integer id);
+
+    /**
      * 添加
      * @param number 编号
      */
@@ -28,4 +35,18 @@ public interface ReceiptsDao {
      * @param id 主键
      */
     void delete(List<Integer> id);
+
+    /**
+     *
+     * @param id
+     * @param count
+     */
+    void updateCountById(Integer id, Integer count);
+
+    /**
+     *
+     * @param id
+     * @param matched
+     */
+    void updateMatchedById(Integer id, Integer matched);
 }

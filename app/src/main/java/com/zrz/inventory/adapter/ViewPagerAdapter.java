@@ -74,14 +74,13 @@ public class ViewPagerAdapter extends BaseAdapter {
         } else {
             //得到缓存的布局
             viewHolder = (ViewPagerAdapter.ViewHolder) convertView.getTag();
-
-            ReceiptsDetail receiptsDetail = dataList.get(position);
-            //设置内容
-            viewHolder.item1.setText(receiptsDetail.getItem1());
-            viewHolder.item2.setText(receiptsDetail.getItem2());
-            viewHolder.item3.setText(receiptsDetail.getItem3());
-            viewHolder.item4.setText(receiptsDetail.getItem4());
         }
+        ReceiptsDetail receiptsDetail = dataList.get(position);
+        //设置内容
+        viewHolder.item1.setText(receiptsDetail.getItem1());
+        viewHolder.item2.setText(receiptsDetail.getItem2());
+        viewHolder.item3.setText(receiptsDetail.getItem3());
+        viewHolder.item4.setText(receiptsDetail.getItem4());
         return convertView;
     }
 

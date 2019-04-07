@@ -26,10 +26,12 @@ public class ReceiptsDetailPresenter {
      * 模型层的控件,对model层进行操作
      */
     ReceiptsDetailInter modelInter;
+    ReceiptsInter receiptsInter;
 
     public ReceiptsDetailPresenter(ViewReceipts viewReceipts, Context context) {
         this.viewReceipts = viewReceipts;
         modelInter = new ReceiptsDetailInterImpl(context);
+        receiptsInter = new ReceiptsInterImpl(context);
     }
 
     public void find(Integer receiptsId, Integer currentPage, Integer pageSize){
@@ -45,7 +47,7 @@ public class ReceiptsDetailPresenter {
                         response.put("receiptsDetailList", (List<ReceiptsDetail>)object);
                         viewReceipts.successHint(response,"find");
                     }
-                }, 3000);
+                }, 500);
             }
 
             @Override
@@ -59,15 +61,17 @@ public class ReceiptsDetailPresenter {
                         response.put("receiptsDetailList", (List<ReceiptsDetail>)object);
                         viewReceipts.successHint(response,"find");
                     }
-                }, 3000);
+                }, 500);
             }
         });
     }
 
-    public void add(ReceiptsDetail receiptsDetail){
+    public void add(final ReceiptsDetail receiptsDetail){
         modelInter.add(receiptsDetail, new OnRequestListener() {
             @Override
             public void success(final Object object) {
+                receiptsInter.updateCountById(receiptsDetail.getReceiptsId(), 1);
+
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -77,7 +81,7 @@ public class ReceiptsDetailPresenter {
                         //返回成功状态信息
                         viewReceipts.successHint(response,"scan");
                     }
-                }, 3000);
+                }, 500);
             }
 
             @Override
@@ -91,7 +95,7 @@ public class ReceiptsDetailPresenter {
                         //返回失败状态信息
                         viewReceipts.failHint(response,"scan");
                     }
-                }, 3000);
+                }, 500);
             }
         });
     }

@@ -37,4 +37,27 @@ public interface ReceiptsInter {
      * @param listener
      */
     void delete(List<Integer> id, OnRequestListener listener);
+
+    /**
+     *
+     * @param id
+     * @param count
+     * @param listener
+     */
+    void updateCountById(Integer id, Integer count, OnRequestListener listener);
+
+    /**
+     *
+     * @param id
+     * @param count
+     */
+    void updateCountById(Integer id, Integer count);
+
+    /**
+     *
+     * @param id
+     * @param matched
+     * @param listener
+     */
+    void updateMatchedById(Integer id, Integer matched, OnRequestListener listener);
 }

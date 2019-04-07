@@ -48,7 +48,7 @@ public class ReceiptsPresenter {
                         response.put("receiptsList", (List<Receipts>)object);
                         viewReceipts.successHint(response,"findAll");
                     }
-                }, 3000);
+                }, 500);
             }
 
             @Override
@@ -62,7 +62,7 @@ public class ReceiptsPresenter {
                         response.put("", (List<Receipts>)object);
                         viewReceipts.successHint(response,"findAll");
                     }
-                }, 3000);
+                }, 500);
             }
         });
     }
@@ -83,7 +83,7 @@ public class ReceiptsPresenter {
                         //返回成功状态信息
                         viewReceipts.successHint(response,"save");
                     }
-                }, 3000);
+                }, 500);
             }
 
             @Override
@@ -100,7 +100,7 @@ public class ReceiptsPresenter {
                         //返回失败状态信息
                         viewReceipts.failHint(response,"save");
                     }
-                }, 3000);
+                }, 500);
             }
         });
     }
@@ -118,7 +118,7 @@ public class ReceiptsPresenter {
                         //返回成功状态信息
                         viewReceipts.successHint(response,"delete");
                     }
-                }, 3000);
+                }, 500);
             }
 
             @Override
@@ -132,7 +132,7 @@ public class ReceiptsPresenter {
                         //返回成功状态信息
                         viewReceipts.successHint(response,"delete");
                     }
-                }, 3000);
+                }, 500);
             }
         });
     }

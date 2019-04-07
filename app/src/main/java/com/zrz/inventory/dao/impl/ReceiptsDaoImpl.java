@@ -50,6 +50,20 @@ public class ReceiptsDaoImpl implements ReceiptsDao {
     }
 
     @Override
+    public Receipts findById(Integer id){
+        database = dbHelper.getReadableDatabase();
+        Cursor cursor = database.query("receipts", new String[]{"id","number","count","matched"}, "id = ?", new String[]{id.toString()}, null, null, null, null);
+        Receipts receipts = new Receipts();
+        while(cursor.moveToNext()){
+            receipts.setCount(cursor.getString(cursor.getColumnIndex("count")));
+            receipts.setMatched(cursor.getString(cursor.getColumnIndex("matched")));
+            receipts.setNumber(cursor.getString(cursor.getColumnIndex("number")));
+            receipts.setId(cursor.getInt(cursor.getColumnIndex("id")));
+        }
+        return receipts;
+    }
+
+    @Override
     public void add(String number) {
         database = dbHelper.getWritableDatabase();
         //方式一：sql语句操作数据库
@@ -68,5 +82,30 @@ public class ReceiptsDaoImpl implements ReceiptsDao {
         for (Integer integer: id) {
             database.delete("receipts", "id=?", new String[]{integer.toString()});
         }
+    }
+
+    @Override
+    public void updateCountById(Integer id, Integer count) {
+        database = dbHelper.getWritableDatabase();
+        values = new ContentValues();
+
+        Cursor cursor = database.query("receipts", new String[]{"id","number","count","matched"}, "id = ?", new String[]{id.toString()}, null, null, null, null);
+        while(cursor.moveToNext()){
+            String temp = cursor.getString(cursor.getColumnIndex("count"));
+            values.put("count", count + Integer.parseInt(temp));
+        }
+        database.update("receipts", values,"id = ?", new String[]{id.toString()});
+    }
+
+    @Override
+    public void updateMatchedById(Integer id, Integer matched) {
+        database = dbHelper.getWritableDatabase();
+        values = new ContentValues();
+        Cursor cursor = database.query("receipts", new String[]{"id","number","count","matched"}, "id = ?", new String[]{id.toString()}, null, null, null, null);
+        while(cursor.moveToNext()){
+            String temp = cursor.getString(cursor.getColumnIndex("matched"));
+            values.put("matched", matched + Integer.parseInt(temp));
+        }
+        database.update("receipts", values,"id = ?", new String[]{id.toString()});
     }
 }
