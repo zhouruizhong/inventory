@@ -57,6 +57,7 @@ public class ReceiptsInterImpl implements ReceiptsInter {
         }
     }
 
+    @Override
     public void delete(List<Integer> id, OnRequestListener listener){
         try{
             receiptsDao.delete(id);
