@@ -64,13 +64,12 @@ public class ViewListAdapter extends BaseAdapter {
         } else {
             //得到缓存的布局
             viewHolder = (ViewHolder) convertView.getTag();
-
-            Receipts receipts = dataList.get(position);
-            //设置内容
-            viewHolder.number.setText(receipts.getNumber());
-            viewHolder.matched.setText(receipts.getMatched());
-            viewHolder.count.setText(receipts.getCount());
         }
+        Receipts receipts = dataList.get(position);
+        //设置内容
+        viewHolder.number.setText(receipts.getNumber());
+        viewHolder.matched.setText(receipts.getMatched());
+        viewHolder.count.setText(receipts.getCount());
         return convertView;
     }
 

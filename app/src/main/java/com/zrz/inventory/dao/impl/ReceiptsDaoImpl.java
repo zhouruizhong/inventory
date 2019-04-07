@@ -28,14 +28,14 @@ public class ReceiptsDaoImpl implements ReceiptsDao {
     }
 
     @Override
-    public List<Receipts> findAll() {
+    public List<Receipts> findAll(Integer currentPage, Integer pageSize) {
         List<Receipts> list = new ArrayList<>(10);
         database = dbHelper.getReadableDatabase();
         //方式一：sql语句操作数据库
 //        String sql = "select * from " + DBHelper.TABLENAME + " where " + DBHelper.COLNUMNAME + " = ?";
 //        Cursor cursor = database.rawQuery(sql, new String[]{name});
         //方法二：封装的api操作，直接操作方法即可
-        Cursor cursor = database.query(DBHelper.TABLENAME, null, DBHelper.COLNUMNAME + " = ?", null, null, null, null);
+        Cursor cursor = database.query("receipts", new String[]{"id","number","count","matched"}, null, null, null, null, null, currentPage.toString() + "," + pageSize.toString());
         Receipts receipts = null;
         while(cursor.moveToNext()){
             receipts = new Receipts();
@@ -59,7 +59,14 @@ public class ReceiptsDaoImpl implements ReceiptsDao {
         //方法二：封装的api操作，直接操作方法即可
         values = new ContentValues();
         values.put("number", number);
-        database.insert("inventory", null, values);
-        database.close();
+        database.insert("receipts", null, values);
+    }
+
+    @Override
+    public void delete(List<Integer> id) {
+        database = dbHelper.getWritableDatabase();
+        for (Integer integer: id) {
+            database.delete("receipts", "id=?", new String[]{integer.toString()});
+        }
     }
 }

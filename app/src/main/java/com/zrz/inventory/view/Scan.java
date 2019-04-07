@@ -15,15 +15,20 @@ import com.zrz.inventory.adapter.ViewPagerAdapter;
 import com.zrz.inventory.bean.BarCode;
 import com.zrz.inventory.bean.LoginResp;
 import com.zrz.inventory.bean.Receipts;
+import com.zrz.inventory.bean.ReceiptsDetail;
 import com.zrz.inventory.fragment.BaseTabFragmentActivity;
+import com.zrz.inventory.presenter.ReceiptsDetailPresenter;
+import com.zrz.inventory.presenter.ReceiptsPresenter;
 import com.zrz.inventory.tools.StringUtils;
 import com.zrz.inventory.tools.UIHelper;
+import com.zrz.inventory.view.viewinter.ViewReceipts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Scan extends BaseTabFragmentActivity {
+public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
 
     private boolean loopFlag = false;
     private int inventoryFlag = 0;
@@ -43,13 +48,19 @@ public class Scan extends BaseTabFragmentActivity {
     private ImageView back;
     private ListView listView;
 
-    private List<BarCode> barCodeList = new ArrayList<>();
+    private List<ReceiptsDetail> receiptsDetails = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
+    private Integer currentPage = 1;
+    private Integer pageSize = 5;
+    private ReceiptsDetailPresenter presenter;
+    private Integer receiptsId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan);
+
+        presenter = new ReceiptsDetailPresenter(this, Scan.this);
 
         // 初始化页面
         initView();
@@ -69,8 +80,9 @@ public class Scan extends BaseTabFragmentActivity {
         Bundle bundle = intent.getExtras();
         LoginResp loginResp = (LoginResp) bundle.getSerializable("login");
         Receipts receipts = (Receipts) bundle.getSerializable("receipts");
-
-        Toast.makeText(Scan.this, loginResp.getMessage(), Toast.LENGTH_LONG).show();
+        receiptsId = receipts.getId();
+        //Toast.makeText(Scan.this, loginResp.getMessage(), Toast.LENGTH_LONG).show();
+        presenter.find(receiptsId, currentPage, pageSize);
 
         code.setText(receipts.getNumber());
         count.setText(receipts.getCount());
@@ -84,19 +96,9 @@ public class Scan extends BaseTabFragmentActivity {
 
     @Override
     protected void initViewPager() {
-        //初始化10项数据
-        BarCode barCode = null;
-        for (int i = 1; i <= 10; i++) {
-            barCode = new BarCode();
-            barCode.setItem1("BBB-BBBB-BBBB" + i);
-            barCode.setItem2("BBBB.BB" + i);
-            barCode.setItem3("状态" + i);
-            barCode.setItem4("999999999999999999999999999" + i);
-            barCodeList.add(barCode);
-        }
 
         //设置ListView的适配器
-        viewPagerAdapter = new ViewPagerAdapter(this, barCodeList);
+        viewPagerAdapter = new ViewPagerAdapter(this, receiptsDetails);
         listView.setAdapter(viewPagerAdapter);
         listView.setSelection(1);
     }
@@ -162,10 +164,37 @@ public class Scan extends BaseTabFragmentActivity {
         scan.setOnClickListener(new ScanClickListener());
     }
 
+    @Override
+    public void successHint(Map<String, Object> response, String tag) {
+        if (tag.equals("find")) {
+            receiptsDetails.clear();
+            receiptsDetails.addAll((List<ReceiptsDetail>) response.get("receiptsDetailList"));
+            viewPagerAdapter.notifyDataSetChanged();
+        }
+        if (tag.equals("scan")){
+            Toast.makeText(this, (String)response.get("message"), Toast.LENGTH_SHORT).show();
+            presenter.find(receiptsId, currentPage, pageSize);
+        }
+    }
+
+    @Override
+    public void failHint(Map<String, Object> response, String tag) {
+        if (tag.equals("find")) {
+            viewPagerAdapter.notifyDataSetChanged();
+        }
+    }
+
     public class ScanClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            readTag();
+            //readTag();
+            ReceiptsDetail receiptsDetail = new ReceiptsDetail();
+            receiptsDetail.setReceiptsId(receiptsId);
+            receiptsDetail.setItem1("item1" + (int) (Math.random() * 10 + 1));
+            receiptsDetail.setItem2("item2" + (int) (Math.random() * 10 + 2));
+            receiptsDetail.setItem3("item3" + (int) (Math.random() * 10 + 3));
+            receiptsDetail.setItem4("item4" + (int) (Math.random() * 10 + 4));
+            presenter.add(receiptsDetail);
         }
     }
 

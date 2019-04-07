@@ -47,13 +47,22 @@ public class ReceiptsInterImpl implements ReceiptsInter {
     }
 
     @Override
-    public void findAll(OnRequestListener listener) {
+    public void findAll(Integer currentPage, Integer pageSize, OnRequestListener listener) {
         try{
 
-            List<Receipts> receiptsList = receiptsDao.findAll();
+            List<Receipts> receiptsList = receiptsDao.findAll(currentPage, pageSize);
             listener.success(receiptsList);
         }catch (Exception e){
             listener.fail(new ArrayList<Receipts>());
+        }
+    }
+
+    public void delete(List<Integer> id, OnRequestListener listener){
+        try{
+            receiptsDao.delete(id);
+            listener.success(1);
+        }catch (Exception e){
+            listener.fail(0);
         }
     }
 }

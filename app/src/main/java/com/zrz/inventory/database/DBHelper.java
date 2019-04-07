@@ -19,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * 版本号
      */
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     /**
      * 表名
@@ -45,10 +45,10 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "create table " + TABLENAME + "(_id integer primary key autoincrement,uName varchar(20) not null,uPass varchar(20) not null)";
-        String sql1 = "create table inventory (id integer primary key autoincrement,number varchar(20) default '' not null, matched integer default 0 not null, count integer default 0 not null)";
-        db.execSQL(sql);
-        db.execSQL(sql1);
+        String receipts = "create table receipts (id integer primary key autoincrement,number varchar(20) default '' not null, matched integer default 0 not null, count integer default 0 not null)";
+        String receipts_detail = "create table receipts_detail (id integer primary key autoincrement, receipts integer not null default 0, item1 varchar(20) default '' not null, item2 varchar(20) default '' not null, item3 varchar(20) default '' not null, item4 varchar(20) default '' not null)";
+        db.execSQL(receipts);
+        db.execSQL(receipts_detail);
     }
 
     /**
@@ -60,7 +60,10 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        String receipts = "create table receipts (id integer primary key autoincrement,number varchar(20) default '' not null, matched integer default 0 not null, count integer default 0 not null)";
+        String receipts_detail = "create table receipts_detail (id integer primary key autoincrement, receipts integer not null default 0, item1 varchar(20) default '' not null, item2 varchar(20) default '' not null, item3 varchar(20) default '' not null, item4 varchar(20) default '' not null)";
+        db.execSQL(receipts);
+        db.execSQL(receipts_detail);
     }
 
     /**

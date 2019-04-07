@@ -46,7 +46,7 @@ public class ReceiptsPresenter {
                         //返回成功状态信息
                         Map<String, Object> response = new HashMap<>(16);
                         response.put("receiptsList", (List<Receipts>)object);
-                        viewReceipts.successHint(response,TAG);
+                        viewReceipts.successHint(response,"findAll");
                     }
                 }, 3000);
             }
@@ -60,7 +60,7 @@ public class ReceiptsPresenter {
                         //返回成功状态信息
                         Map<String, Object> response = new HashMap<>(16);
                         response.put("", (List<Receipts>)object);
-                        viewReceipts.successHint(response,TAG);
+                        viewReceipts.successHint(response,"findAll");
                     }
                 }, 3000);
             }
@@ -81,7 +81,7 @@ public class ReceiptsPresenter {
 
                         response.put("receipts", receipts);
                         //返回成功状态信息
-                        viewReceipts.successHint(response,TAG);
+                        viewReceipts.successHint(response,"save");
                     }
                 }, 3000);
             }
@@ -98,7 +98,39 @@ public class ReceiptsPresenter {
 
                         response.put("receipts", receipts);
                         //返回失败状态信息
-                        viewReceipts.failHint(response,TAG);
+                        viewReceipts.failHint(response,"save");
+                    }
+                }, 3000);
+            }
+        });
+    }
+
+    public void delete(List<Integer> id){
+        modelInter.delete(id, new OnRequestListener() {
+            @Override
+            public void success(Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("message", "删除成功");
+                        //返回成功状态信息
+                        viewReceipts.successHint(response,"delete");
+                    }
+                }, 3000);
+            }
+
+            @Override
+            public void fail(Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("message", "删除失败");
+                        //返回成功状态信息
+                        viewReceipts.successHint(response,"delete");
                     }
                 }, 3000);
             }

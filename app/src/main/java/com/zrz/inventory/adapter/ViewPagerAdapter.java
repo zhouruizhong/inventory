@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.zrz.inventory.R;
 import com.zrz.inventory.bean.BarCode;
 import com.zrz.inventory.bean.Receipts;
+import com.zrz.inventory.bean.ReceiptsDetail;
 import com.zrz.inventory.fragment.KeyDwonFragment;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ViewPagerAdapter extends BaseAdapter {
     /**
      * ListView显示的数据
      */
-    private List<BarCode> dataList;
+    private List<ReceiptsDetail> dataList;
 
     /**
      * 构造器
@@ -42,7 +43,7 @@ public class ViewPagerAdapter extends BaseAdapter {
      * @param context  上下文对象
      * @param dataList 数据
      */
-    public ViewPagerAdapter(Context context, List<BarCode> dataList) {
+    public ViewPagerAdapter(Context context, List<ReceiptsDetail> dataList) {
         this.context = context;
         this.dataList = dataList;
     }
@@ -74,12 +75,12 @@ public class ViewPagerAdapter extends BaseAdapter {
             //得到缓存的布局
             viewHolder = (ViewPagerAdapter.ViewHolder) convertView.getTag();
 
-            BarCode barCode = dataList.get(position);
+            ReceiptsDetail receiptsDetail = dataList.get(position);
             //设置内容
-            viewHolder.item1.setText(barCode.getItem1());
-            viewHolder.item2.setText(barCode.getItem2());
-            viewHolder.item3.setText(barCode.getItem3());
-            viewHolder.item4.setText(barCode.getItem4());
+            viewHolder.item1.setText(receiptsDetail.getItem1());
+            viewHolder.item2.setText(receiptsDetail.getItem2());
+            viewHolder.item3.setText(receiptsDetail.getItem3());
+            viewHolder.item4.setText(receiptsDetail.getItem4());
         }
         return convertView;
     }

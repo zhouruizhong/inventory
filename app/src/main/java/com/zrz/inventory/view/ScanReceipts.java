@@ -22,50 +22,46 @@ import com.zrz.inventory.view.viewinter.ViewReceipts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ScanReceipts extends Activity implements ViewReceipts {
 
-    private ViewPager viewPager;
     private ListView listView;
     /**
      * 返回
      */
-    private ImageView scanReceiptsBack;
+    private ImageView back;
     /**
      * 添加
      */
     private ImageView add;
-    /**
-     * 全选
-     */
-    private Button checkAll;
-    /**
-     * 删除
-     */
-    private Button delete;
     private PopupWindow popupWindow;
     private ReceiptsPresenter presenter;
     private List<Receipts> receiptsList = new ArrayList<>();
     private ViewListAdapter viewListAdapter;
-    private Integer current_index;
+    private Integer currentPage = 1;
+    private Integer pageSize = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_receipts);
 
-        initView();
-        initData();
-        event();
         presenter = new ReceiptsPresenter(this, ScanReceipts.this);
+        // 查询数据
+        presenter.findAll(currentPage, pageSize);
+
+        initView();
+
+        initData();
+
+        event();
     }
 
     private void initView() {
         listView = findViewById(R.id.listView);
-        scanReceiptsBack = findViewById(R.id.scan_receipts_back);
+        back = findViewById(R.id.scan_receipts_back);
         add = findViewById(R.id.add);
-        checkAll = findViewById(R.id.check_all);
-        delete = findViewById(R.id.delete);
     }
 
     /**
@@ -73,32 +69,32 @@ public class ScanReceipts extends Activity implements ViewReceipts {
      */
     private void initData() {
         //初始化10项数据
-        Receipts receipts = null;
-        for (int i = 1; i <= 10; i++) {
+        /*Receipts receipts = null;
+        for (int i = 1; i <= 1; i++) {
             receipts = new Receipts();
             receipts.setNumber("100" + i);
-            receipts.setMatched(i + "");
-            receipts.setCount(i + "");
+            receipts.setMatched("");
+            receipts.setCount("");
             receipts.setId(1);
             receiptsList.add(receipts);
-        }
+        }*/
+        presenter.findAll(currentPage, pageSize);
 
         //设置ListView的适配器
         viewListAdapter = new ViewListAdapter(this, receiptsList);
         listView.setAdapter(viewListAdapter);
         listView.setSelection(1);
 
-
     }
 
-    public void setViewDisEnabled() {
-        checkAll.setVisibility(View.GONE);
-        delete.setVisibility(View.GONE);
+    public void refreshListView(){
+        presenter.findAll(currentPage,pageSize);
+        viewListAdapter.notifyDataSetChanged();
     }
 
     private void event() {
         // 返回
-        scanReceiptsBack.setOnClickListener(new View.OnClickListener() {
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -135,8 +131,6 @@ public class ScanReceipts extends Activity implements ViewReceipts {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String result = input.getText().toString().trim();
-                        //    将输入的用户名和密码打印出来
-                        Toast.makeText(ScanReceipts.this, "您输入的内容是： " + result, Toast.LENGTH_SHORT).show();
                         presenter.add(result);
                     }
                 });
@@ -163,7 +157,7 @@ public class ScanReceipts extends Activity implements ViewReceipts {
                 //获取选择的项的值
                 Receipts receipts = (Receipts) parent.getItemAtPosition(position);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("receipts",receipts);
+                bundle.putSerializable("receipts", receipts);
 
                 Intent intent = new Intent(ScanReceipts.this, Scan.class);
                 intent.putExtras(bundle);
@@ -173,12 +167,26 @@ public class ScanReceipts extends Activity implements ViewReceipts {
     }
 
     @Override
-    public void successHint(Receipts receipts, String tag) {
-        Toast.makeText(this, tag + "成功", Toast.LENGTH_SHORT).show();
+    public void successHint(Map<String, Object> response, String tag) {
+        if (tag.equals("findAll")){
+            receiptsList.clear();
+            receiptsList.addAll((List<Receipts>) response.get("receiptsList"));
+            viewListAdapter.notifyDataSetChanged();
+        }
+
+        if (tag.equals("save")){
+            Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
+            presenter.findAll(currentPage, pageSize);
+        }
     }
 
     @Override
-    public void failHint(Receipts receipts, String tag) {
-        Toast.makeText(this, tag + "失败", Toast.LENGTH_SHORT).show();
+    public void failHint(Map<String, Object> response, String tag) {
+        if (tag.equals("findAll")){
+            receiptsList = (List<Receipts>) response.get("receiptsList");
+        }
+        if (tag.equals("save")){
+            Toast.makeText(this, "添加失败", Toast.LENGTH_SHORT).show();
+        }
     }
 }

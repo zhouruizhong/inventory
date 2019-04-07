@@ -30,4 +30,11 @@ public interface ReceiptsInter {
      * @return
      */
     void findAll(Integer currentPage, Integer pageSize, OnRequestListener listener);
+
+    /**
+     * 删除
+     * @param id
+     * @param listener
+     */
+    void delete(List<Integer> id, OnRequestListener listener);
 }

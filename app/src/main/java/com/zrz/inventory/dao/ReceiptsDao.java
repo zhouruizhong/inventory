@@ -15,11 +15,17 @@ public interface ReceiptsDao {
      *
      * @return
      */
-    List<Receipts> findAll();
+    List<Receipts> findAll(Integer currentPage, Integer pageSize);
 
     /**
      * 添加
      * @param number 编号
      */
     void add(String number);
+
+    /**
+     * 删除
+     * @param id 主键
+     */
+    void delete(List<Integer> id);
 }
