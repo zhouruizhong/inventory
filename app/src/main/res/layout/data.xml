@@ -4,6 +4,7 @@
           android:layout_height="match_parent"
           android:clipToPadding="false"
           android:orientation="vertical"
+          android:background="@drawable/card_shape"
           android:fitsSystemWindows="true" >
 
     <LinearLayout
@@ -39,6 +40,13 @@
                 android:text="是状态"/>
 
     </LinearLayout>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="7dp"
+            android:background="#E0E0E0"/>
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,7 +58,7 @@
                 android:layout_height="25dp"
                 android:layout_marginTop="1dp"
                 android:layout_weight="1"
-                android:text="8888888888888888888888888888888888888888888888"
+                android:text="88888888888888888888888888888888888888888888"
                 android:gravity="center"/>
 
     </LinearLayout>
