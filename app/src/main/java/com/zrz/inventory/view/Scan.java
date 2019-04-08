@@ -12,23 +12,22 @@ import android.view.View;
 import android.widget.*;
 import com.zrz.inventory.R;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
-import com.zrz.inventory.bean.BarCode;
 import com.zrz.inventory.bean.LoginResp;
 import com.zrz.inventory.bean.Receipts;
 import com.zrz.inventory.bean.ReceiptsDetail;
 import com.zrz.inventory.fragment.BaseTabFragmentActivity;
 import com.zrz.inventory.presenter.ReceiptsDetailPresenter;
-import com.zrz.inventory.presenter.ReceiptsPresenter;
 import com.zrz.inventory.tools.StringUtils;
 import com.zrz.inventory.tools.UIHelper;
 import com.zrz.inventory.view.viewinter.ViewReceipts;
+import com.zrz.inventory.widget.LoadListView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
+public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadListView.ILoadListener {
 
     private boolean loopFlag = false;
     private int inventoryFlag = 0;
@@ -47,7 +46,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
     private HashMap<String, String> map;
     private EditText editText;
     private ImageView back;
-    private ListView listView;
+    private LoadListView listView;
 
     private List<ReceiptsDetail> receiptsDetails = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
@@ -150,6 +149,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
         scan = findViewById(R.id.scan);
         upload = findViewById(R.id.upload);
         listView = findViewById(R.id.list_item);
+        listView.setInterface(this);
         tagList = new ArrayList<>(10);
 
     }
@@ -170,13 +170,15 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
     @Override
     public void successHint(Map<String, Object> response, String tag) {
         if (tag.equals("find")) {
-            receiptsDetails.clear();
-
             List<ReceiptsDetail> receiptsDetailList = (List<ReceiptsDetail>) response.get("receiptsDetailList");
-            receiptsDetails.addAll(receiptsDetailList);
+            if (receiptsDetailList.size() > 0){
+                receiptsDetails.addAll(receiptsDetailList);
 
-            count.setText(receiptsDetailList.size()+"");
-            viewPagerAdapter.notifyDataSetChanged();
+                count.setText(receiptsDetailList.size()+"");
+                viewPagerAdapter.notifyDataSetChanged();
+            }else{
+                Toast.makeText(this, "已经到底线了", Toast.LENGTH_SHORT).show();
+            }
         }
         if (tag.equals("scan")){
             Toast.makeText(this, (String)response.get("message"), Toast.LENGTH_SHORT).show();
@@ -189,6 +191,26 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts {
         if (tag.equals("find")) {
             viewPagerAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onLoad() {
+        //获取更多数据
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 下一页
+                currentPage++;
+                presenter.find(receiptsId, currentPage, pageSize);
+
+                listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+                listView.setStackFromBottom(true);
+                //通知listView加载完毕，底部布局消失
+                listView.loadComplete();
+            }
+
+        }, 500);
     }
 
     public class UploadClickListener implements View.OnClickListener{

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Handler;
 import android.support.annotation.ColorInt;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -19,14 +20,15 @@ import com.zrz.inventory.adapter.ViewPagerAdapter;
 import com.zrz.inventory.bean.Receipts;
 import com.zrz.inventory.presenter.ReceiptsPresenter;
 import com.zrz.inventory.view.viewinter.ViewReceipts;
+import com.zrz.inventory.widget.LoadListView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ScanReceipts extends Activity implements ViewReceipts {
+public class ScanReceipts extends Activity implements ViewReceipts, LoadListView.ILoadListener {
 
-    private ListView listView;
+    private ListView mListView;
     /**
      * 返回
      */
@@ -40,7 +42,8 @@ public class ScanReceipts extends Activity implements ViewReceipts {
     private List<Receipts> receiptsList = new ArrayList<>();
     private ViewListAdapter viewListAdapter;
     private Integer currentPage = 1;
-    private Integer pageSize = 10;
+    private Integer pageSize = 5;
+    private LoadListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,37 +62,20 @@ public class ScanReceipts extends Activity implements ViewReceipts {
     }
 
     private void initView() {
-        listView = findViewById(R.id.listView);
         back = findViewById(R.id.scan_receipts_back);
         add = findViewById(R.id.add);
+        listView = findViewById(R.id.listView);
+        listView.setInterface(this);
     }
 
     /**
      * 初始化数据
      */
     private void initData() {
-        //初始化10项数据
-        /*Receipts receipts = null;
-        for (int i = 1; i <= 1; i++) {
-            receipts = new Receipts();
-            receipts.setNumber("100" + i);
-            receipts.setMatched("");
-            receipts.setCount("");
-            receipts.setId(1);
-            receiptsList.add(receipts);
-        }*/
-        presenter.findAll(currentPage, pageSize);
-
         //设置ListView的适配器
         viewListAdapter = new ViewListAdapter(this, receiptsList);
         listView.setAdapter(viewListAdapter);
         listView.setSelection(1);
-
-    }
-
-    public void refreshListView(){
-        presenter.findAll(currentPage,pageSize);
-        viewListAdapter.notifyDataSetChanged();
     }
 
     private void event() {
@@ -168,13 +154,17 @@ public class ScanReceipts extends Activity implements ViewReceipts {
 
     @Override
     public void successHint(Map<String, Object> response, String tag) {
-        if (tag.equals("findAll")){
-            receiptsList.clear();
-            receiptsList.addAll((List<Receipts>) response.get("receiptsList"));
-            viewListAdapter.notifyDataSetChanged();
+        if (tag.equals("findAll")) {
+            List<Receipts> receipts = (List<Receipts>) response.get("receiptsList");
+            if (receipts.size() > 0) {
+                receiptsList.addAll(receipts);
+                viewListAdapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(this, "我是有底线的!", Toast.LENGTH_SHORT).show();
+            }
         }
 
-        if (tag.equals("save")){
+        if (tag.equals("save")) {
             Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
             presenter.findAll(currentPage, pageSize);
         }
@@ -182,11 +172,33 @@ public class ScanReceipts extends Activity implements ViewReceipts {
 
     @Override
     public void failHint(Map<String, Object> response, String tag) {
-        if (tag.equals("findAll")){
-            receiptsList = (List<Receipts>) response.get("receiptsList");
+        if (tag.equals("findAll")) {
+            Toast.makeText(this, "查询数据异常", Toast.LENGTH_SHORT).show();
         }
-        if (tag.equals("save")){
+        if (tag.equals("save")) {
             Toast.makeText(this, "添加失败", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onLoad() {
+        //获取更多数据
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                currentPage = currentPage + 1;
+                presenter.findAll(currentPage, pageSize);
+                //通知listView显示更新,加载完毕
+
+                /**
+                 * 设置默认显示为Listview最后一行
+                 */
+                listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+                listView.setStackFromBottom(true);
+                //通知listView加载完毕，底部布局消失
+                listView.loadComplete();
+            }
+        }, 500);
     }
 }

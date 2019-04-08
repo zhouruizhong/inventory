@@ -47,7 +47,7 @@ public class ReceiptsDetailDaoImpl implements ReceiptsDetailDao {
 //        String sql = "select * from " + DBHelper.TABLENAME + " where " + DBHelper.COLNUMNAME + " = ?";
 //        Cursor cursor = database.rawQuery(sql, new String[]{name});
         //方法二：封装的api操作，直接操作方法即可
-        Cursor cursor = database.query("receipts_detail", new String[]{"id", "receipts","item1","item2","item3", "item4"}, "receipts = ?", new String[]{receiptsId.toString()}, null, null, null, currentPage.toString() + "," + pageSize.toString());
+        Cursor cursor = database.query("receipts_detail", new String[]{"id", "receipts","item1","item2","item3", "item4"}, "receipts = ?", new String[]{receiptsId.toString()}, null, null, null, ((currentPage - 1) * pageSize) + "," + (currentPage * pageSize));
         ReceiptsDetail detail = null;
         while(cursor.moveToNext()){
             detail = new ReceiptsDetail();
