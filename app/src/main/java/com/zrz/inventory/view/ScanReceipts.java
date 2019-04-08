@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.*;
+import com.lidroid.xutils.view.annotation.event.OnClick;
 import com.zrz.inventory.R;
 import com.zrz.inventory.adapter.ViewListAdapter;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
@@ -78,6 +79,52 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
         listView.setSelection(1);
     }
 
+    public class ButtonOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            /* @setView 装入自定义View ==> R.layout.dialog_customize
+             * 由于dialog_customize.xml只放置了一个EditView，因此和图8一样
+             * dialog_customize.xml可自定义更复杂的View
+             */
+            final AlertDialog.Builder customizeDialog = new AlertDialog.Builder(ScanReceipts.this);
+            final View dialogView = LayoutInflater.from(ScanReceipts.this).inflate(R.layout.dialog, null);
+            customizeDialog.setView(dialogView);
+            customizeDialog.setCancelable(true);
+            customizeDialog.setIcon(R.mipmap.close);
+
+            // 获取EditView中的输入内容
+            final ImageView close = dialogView.findViewById(R.id.dialog_close);
+            final EditText input = dialogView.findViewById(R.id.dialog_input);
+            final Button ok = dialogView.findViewById(R.id.dialog_ok);
+
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String result = input.getText().toString().trim();
+                    presenter.add(result);
+
+                    //关闭弹窗
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            customizeDialog.create().dismiss();
+                        }
+                    },1000);
+                }
+            });
+
+            close.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    customizeDialog.create().dismiss();
+                }
+            });
+            customizeDialog.show();
+        }
+    }
+
     private void event() {
         // 返回
         back.setOnClickListener(new View.OnClickListener() {
@@ -87,54 +134,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
             }
         });
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(ScanReceipts.this);
-                //    通过LayoutInflater来加载一个xml的布局文件作为一个View对象
-                View view = LayoutInflater.from(ScanReceipts.this).inflate(R.layout.dialog, null);
-                //    设置我们自己定义的布局文件作为弹出框的Content
-                builder.setView(view);
-
-                final ImageView close = view.findViewById(R.id.dialog_close);
-                final EditText input = view.findViewById(R.id.dialog_input);
-                //final Button confirm = view.findViewById(R.id.dialog_confirm);
-
-                close.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(ScanReceipts.this, "关闭弹窗！", Toast.LENGTH_LONG).show();
-                        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialogInterface) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                    }
-                });
-
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String result = input.getText().toString().trim();
-                        presenter.add(result);
-                    }
-                });
-
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                /**confirm.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) {
-                Toast.makeText(ScanReceipts.this, "您输入的内容是：" + input.getText(), Toast.LENGTH_LONG).show();
-                }
-                });*/
-                builder.show();
-            }
-        });
+        add.setOnClickListener(new ButtonOnClickListener());
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
