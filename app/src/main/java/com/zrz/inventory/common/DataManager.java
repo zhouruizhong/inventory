@@ -2,6 +2,8 @@ package com.zrz.inventory.common;
 
 import android.content.Context;
 import com.zrz.inventory.bean.LoginResp;
+import com.zrz.inventory.bean.ResponseObject;
+import com.zrz.inventory.bean.Upload;
 import com.zrz.inventory.bean.Uuid;
 import rx.Observable;
 
@@ -37,5 +39,9 @@ public class DataManager {
 
     public Observable<LoginResp> checkLogin(String uuid) {
         return mRetrofitService.checkLogin(uuid);
+    }
+
+    public Observable<ResponseObject> rfidAdd(Upload upload){
+        return mRetrofitService.rfidAdd(upload);
     }
 }

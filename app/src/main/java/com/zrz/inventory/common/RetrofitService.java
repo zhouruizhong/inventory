@@ -1,11 +1,10 @@
 package com.zrz.inventory.common;
 
 import com.zrz.inventory.bean.LoginResp;
+import com.zrz.inventory.bean.ResponseObject;
+import com.zrz.inventory.bean.Upload;
 import com.zrz.inventory.bean.Uuid;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 import rx.Observable;
 
 public interface RetrofitService {
@@ -22,7 +21,7 @@ public interface RetrofitService {
      * @param uuid 初始化的uuid
      * @return 二维码图片
      */
-    @GET("loginQr/${uuid}")
+    @GET("loginQr/{uuid}")
     Observable<String> generateQrcode(@Path("uuid") String uuid);
 
     /**
@@ -33,7 +32,12 @@ public interface RetrofitService {
     @GET("external/login/checkLogin")
     Observable<LoginResp> checkLogin(@Query("uuid") String uuid);
 
+    /**
+     * 盘点数据接口，扫描后上传（post）
+     * @param upload
+     * @return
+     */
     @POST("api/stocking/rfidAdd")
-    void rfidAdd();
+    Observable<ResponseObject> rfidAdd(@Body Upload upload);
 
 }

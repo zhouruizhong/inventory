@@ -12,13 +12,13 @@ import android.view.View;
 import android.widget.*;
 import com.zrz.inventory.R;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
-import com.zrz.inventory.bean.LoginResp;
-import com.zrz.inventory.bean.Receipts;
-import com.zrz.inventory.bean.ReceiptsDetail;
+import com.zrz.inventory.bean.*;
 import com.zrz.inventory.fragment.BaseTabFragmentActivity;
 import com.zrz.inventory.presenter.ReceiptsDetailPresenter;
+import com.zrz.inventory.presenter.UploadPresenter;
 import com.zrz.inventory.tools.StringUtils;
 import com.zrz.inventory.tools.UIHelper;
+import com.zrz.inventory.view.viewinter.UploadView;
 import com.zrz.inventory.view.viewinter.ViewReceipts;
 import com.zrz.inventory.widget.LoadListView;
 
@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadListView.ILoadListener {
+public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadListView.ILoadListener, UploadView {
 
     private boolean loopFlag = false;
     private int inventoryFlag = 0;
@@ -53,6 +53,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
     private Integer currentPage = 1;
     private Integer pageSize = 10;
     private ReceiptsDetailPresenter presenter;
+    private UploadPresenter uploadPresenter = new UploadPresenter(this, Scan.this);
     private Integer receiptsId;
 
     @Override
@@ -182,7 +183,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
         }
         if (tag.equals("scan")){
             Toast.makeText(this, (String)response.get("message"), Toast.LENGTH_SHORT).show();
-            presenter.find(receiptsId, currentPage, pageSize);
+            //presenter.find(receiptsId, currentPage, pageSize);
         }
     }
 
@@ -213,13 +214,47 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
         }, 500);
     }
 
+    @Override
+    public void onSuccess(ResponseObject object) {
+
+    }
+
+    @Override
+    public void onError(String result) {
+
+    }
+
     public class UploadClickListener implements View.OnClickListener{
 
         @Override
         public void onClick(View v) {
-
+            uploadPresenter.onCreate();
+            uploadPresenter.attachView(uploadView);
+            Upload upload = new Upload();
+            upload.setJhKey("");
+            upload.setRfidData("");
+            upload.setSign("");
+            upload.setTimestamp("");
+            uploadPresenter.rfidAdd(upload);
         }
     }
+
+    private UploadView uploadView = new UploadView() {
+        @Override
+        public void onSuccess(ResponseObject object) {
+            String code = object.getCode();
+            if ("200".equals(code)){
+                Toast.makeText(Scan.this, "upload success", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(Scan.this, object.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onError(String result) {
+            Toast.makeText(Scan.this, result, Toast.LENGTH_LONG).show();
+        }
+    };
 
     public class ScanClickListener implements View.OnClickListener {
         @Override

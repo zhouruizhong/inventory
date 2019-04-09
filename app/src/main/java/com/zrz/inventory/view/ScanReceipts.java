@@ -20,6 +20,7 @@ import com.zrz.inventory.adapter.ViewListAdapter;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
 import com.zrz.inventory.bean.Receipts;
 import com.zrz.inventory.presenter.ReceiptsPresenter;
+import com.zrz.inventory.tools.StringUtils;
 import com.zrz.inventory.view.viewinter.ViewReceipts;
 import com.zrz.inventory.widget.LoadListView;
 
@@ -87,11 +88,12 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
              * 由于dialog_customize.xml只放置了一个EditView，因此和图8一样
              * dialog_customize.xml可自定义更复杂的View
              */
-            final AlertDialog.Builder customizeDialog = new AlertDialog.Builder(ScanReceipts.this);
+            final AlertDialog.Builder customizeDialog = new AlertDialog.Builder(ScanReceipts.this, R.style.Theme_AppCompat_DayNight_Dialog_Alert);
             final View dialogView = LayoutInflater.from(ScanReceipts.this).inflate(R.layout.dialog, null);
             customizeDialog.setView(dialogView);
             customizeDialog.setCancelable(true);
-            customizeDialog.setIcon(R.mipmap.close);
+
+            final AlertDialog dialog = customizeDialog.create();
 
             // 获取EditView中的输入内容
             final ImageView close = dialogView.findViewById(R.id.dialog_close);
@@ -102,26 +104,22 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
                 @Override
                 public void onClick(View v) {
                     String result = input.getText().toString().trim();
-                    presenter.add(result);
-
-                    //关闭弹窗
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            customizeDialog.create().dismiss();
-                        }
-                    },1000);
+                    if (StringUtils.isNotEmpty(result)){
+                        presenter.add(result);
+                        dialog.dismiss();
+                    }else{
+                        Toast.makeText(ScanReceipts.this, R.string.please_input_number, Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
 
             close.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    customizeDialog.create().dismiss();
+                    dialog.dismiss();
                 }
             });
-            customizeDialog.show();
+            dialog.show();
         }
     }
 
@@ -166,7 +164,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
 
         if (tag.equals("save")) {
             Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
-            presenter.findAll(currentPage, pageSize);
+            //presenter.findAll(currentPage, pageSize);
         }
     }
 
