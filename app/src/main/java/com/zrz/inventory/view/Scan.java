@@ -178,11 +178,14 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
                 count.setText(receiptsDetailList.size()+"");
                 viewPagerAdapter.notifyDataSetChanged();
             }else{
-                Toast.makeText(this, "已经到底线了", Toast.LENGTH_SHORT).show();
+                if(currentPage > 1){
+                    Toast.makeText(this, "已经到底线了", Toast.LENGTH_SHORT).show();
+                }
             }
         }
         if (tag.equals("scan")){
             Toast.makeText(this, (String)response.get("message"), Toast.LENGTH_SHORT).show();
+            viewPagerAdapter.notifyDataSetChanged();
             //presenter.find(receiptsId, currentPage, pageSize);
         }
     }

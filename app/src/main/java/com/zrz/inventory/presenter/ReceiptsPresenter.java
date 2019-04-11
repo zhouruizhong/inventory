@@ -78,6 +78,8 @@ public class ReceiptsPresenter {
                         Map<String, Object> response = new HashMap<>(16);
                         Receipts receipts = new Receipts();
                         receipts.setNumber(number);
+                        receipts.setCount("0");
+                        receipts.setMatched("0");
 
                         response.put("receipts", receipts);
                         //返回成功状态信息

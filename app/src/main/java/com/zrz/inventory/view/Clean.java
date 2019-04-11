@@ -1,6 +1,7 @@
 package com.zrz.inventory.view;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Handler;
@@ -77,16 +78,14 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //获取选择的项的值
-                Receipts receipts = (Receipts) parent.getItemAtPosition(position);
-                if (null != indexs && indexs.contains(receipts.getId())) {
-                    indexs.remove(receipts.getId());
+                if(viewListAdapter.isItemSelected(position)){
+                    viewListAdapter.removeselected();
                     view.setBackgroundColor(0);
-                } else {
-                    indexs.add(receipts.getId());
+                }else{
+                    viewListAdapter.addSelected(position);
                     view.setBackgroundColor(getResources().getColor(R.color.blue3));
-                    //viewListAdapter.notifyDataSetChanged();
                 }
+                viewListAdapter.notifyDataSetInvalidated();
             }
         });
 
@@ -100,7 +99,8 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (indexs.size() == 0) {
+                final List<Integer> selectList = viewListAdapter.getSelectList();
+                if (selectList.size() == 0) {
                     Toast.makeText(Clean.this, "请您先选中一行！", Toast.LENGTH_SHORT).show();
                 } else {
                     //    通过AlertDialog.Builder这个类来实例化我们的一个AlertDialog的对象
@@ -111,7 +111,7 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
                     builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            presenter.delete(indexs);
+                            presenter.delete(selectList);
                         }
                     });
                     //    设置一个NegativeButton
@@ -127,10 +127,17 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
             }
         });
 
+        /**
+         * 全选
+         */
         checkAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                indexs = new ArrayList<>(10);
+                viewListAdapter.removeselected();
+                for (Receipts receipts: receiptsList){
+                    viewListAdapter.addSelected(receipts.getId());
+                }
+                viewListAdapter.notifyDataSetInvalidated();
             }
         });
     }
@@ -143,7 +150,10 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
                 receiptsList.addAll(receipts);
                 viewListAdapter.notifyDataSetChanged();
             } else {
-                Toast.makeText(this, "没有更多了!", Toast.LENGTH_SHORT).show();
+                if (currentPage > 1) {
+                    Toast.makeText(this, "没有更多了!", Toast.LENGTH_SHORT).show();
+                    viewListAdapter.notifyDataSetChanged();
+                }
             }
         }
         if (tag.equals("delete")) {
