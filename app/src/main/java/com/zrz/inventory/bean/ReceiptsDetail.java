@@ -29,6 +29,13 @@ public class ReceiptsDetail implements Serializable {
      */
     private String item4;
 
+    public ReceiptsDetail(){
+        this.item1 = "";
+        this.item2 = "";
+        this.item3 = "";
+        this.item4 = "";
+    }
+
     public Integer getId() {
         return id;
     }

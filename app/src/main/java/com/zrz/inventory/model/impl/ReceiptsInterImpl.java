@@ -95,4 +95,13 @@ public class ReceiptsInterImpl implements ReceiptsInter {
             listener.fail(0);
         }
     }
+
+    @Override
+    public void updateMatchedById(Integer id, Integer matched) {
+        try{
+            receiptsDao.updateMatchedById(id, matched);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

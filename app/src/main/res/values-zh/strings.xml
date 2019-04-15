@@ -121,7 +121,9 @@
     <string name="rbInventoryAnti">防碰撞</string>
     <string name="tvQ">Q值：</string>
     <string name="btInventory">开始识别</string>
+    <string name="btScan">开始扫描</string>
     <string name="title_stop_Inventory">停止识别</string>
+    <string name="title_stop_scan">停止扫描</string>
     <string name="tvTagUii">标签</string>
     <string name="tvTagLen">长度</string>
     <string name="tvTagCount">数量</string>

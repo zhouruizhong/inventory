@@ -12,6 +12,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
+import java.util.Map;
+
 public class UploadPresenter {
 
     private DataManager manager;
@@ -59,8 +61,8 @@ public class UploadPresenter {
     public void attachIncomingIntent(Intent intent) {
     }
 
-    public void rfidAdd(Upload upload) {
-        mCompositeSubscription.add(manager.rfidAdd(upload)
+    public void rfidAdd(String token, Map<String, Object> map) {
+        mCompositeSubscription.add(manager.rfidAdd(token, map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<ResponseObject>() {

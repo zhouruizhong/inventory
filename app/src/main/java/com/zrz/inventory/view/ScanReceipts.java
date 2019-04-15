@@ -164,10 +164,19 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
             }
         }
 
+        if(tag.equals("refresh")){
+                List<Receipts> receipts = (List<Receipts>) response.get("receiptsList");
+                receiptsList.clear();
+                receiptsList.addAll(receipts);
+                viewListAdapter.notifyDataSetChanged();
+        }
+
         if (tag.equals("save")) {
             Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
-            viewListAdapter.notifyDataSetChanged();
-            //presenter.findAll(currentPage, pageSize);
+            if (receiptsList.size() >= pageSize){
+                currentPage++;
+            }
+            presenter.refresh(currentPage, pageSize);
         }
     }
 

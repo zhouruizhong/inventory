@@ -59,8 +59,40 @@ public class ReceiptsPresenter {
                     public void run() {
                         //返回成功状态信息
                         Map<String, Object> response = new HashMap<>(16);
-                        response.put("", (List<Receipts>)object);
+                        response.put("receiptsList", (List<Receipts>)object);
                         viewReceipts.successHint(response,"findAll");
+                    }
+                }, 500);
+            }
+        });
+    }
+
+    public void refresh(Integer currentPage, Integer pageSize){
+        modelInter.findAll(currentPage, pageSize, new OnRequestListener(){
+            @Override
+            public void success(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsList", (List<Receipts>)object);
+                        viewReceipts.successHint(response,"refresh");
+                    }
+                }, 500);
+            }
+
+            @Override
+            public void fail(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsList", (List<Receipts>)object);
+                        viewReceipts.successHint(response,"refresh");
                     }
                 }, 500);
             }

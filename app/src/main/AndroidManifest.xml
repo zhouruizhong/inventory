@@ -24,7 +24,11 @@
         <activity android:name=".view.Inventory"/>
         <activity android:name=".view.Index"/>
         <activity android:name=".view.Scan"/>
-        <activity android:name=".view.Clean" />
+        <activity android:name=".view.Clean"/>
+        <activity
+                android:name=".view.Invalid"
+                android:label="@string/title_activity_invalid">
+        </activity>
     </application>
 
 </manifest>

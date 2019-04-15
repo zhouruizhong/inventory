@@ -156,9 +156,17 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
                 }
             }
         }
+
+        if (tag.equals("refresh")){
+            List<Receipts> receipts = (List<Receipts>) response.get("receiptsList");
+            receiptsList.clear();
+            receiptsList.addAll(receipts);
+            viewListAdapter.notifyDataSetChanged();
+        }
+
         if (tag.equals("delete")) {
             Toast.makeText(this, (String) response.get("message"), Toast.LENGTH_SHORT).show();
-            presenter.findAll(currentPage, pageSize);
+            presenter.refresh(currentPage, pageSize);
         }
     }
 

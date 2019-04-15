@@ -7,6 +7,8 @@ import com.zrz.inventory.bean.Upload;
 import com.zrz.inventory.bean.Uuid;
 import rx.Observable;
 
+import java.util.Map;
+
 /**
  * @author zhouruizhong
  */
@@ -41,7 +43,7 @@ public class DataManager {
         return mRetrofitService.checkLogin(uuid);
     }
 
-    public Observable<ResponseObject> rfidAdd(Upload upload){
-        return mRetrofitService.rfidAdd(upload);
+    public Observable<ResponseObject> rfidAdd(String token, Map<String, Object> map){
+        return mRetrofitService.rfidAdd(token, map);
     }
 }

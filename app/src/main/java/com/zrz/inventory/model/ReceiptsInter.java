@@ -60,4 +60,11 @@ public interface ReceiptsInter {
      * @param listener
      */
     void updateMatchedById(Integer id, Integer matched, OnRequestListener listener);
+
+    /**
+     *
+     * @param id
+     * @param matched
+     */
+    void updateMatchedById(Integer id, Integer matched);
 }

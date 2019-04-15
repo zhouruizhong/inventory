@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="3dp"
+        tools:context=".view.Invalid">
+    <TextView
+            android:id="@+id/invalid_title"
+            android:text="@string/invalid_code"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"/>
+    <Button
+            android:id="@+id/invalid_refresh"
+            android:text="@string/click_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:textColor="@color/white1"
+            android:background="@color/red5"/>
+
+    <ImageView
+            android:id="@+id/qr_code"
+            android:layout_width="158dp"
+            android:layout_height="149dp"
+            android:layout_gravity="center"/>
+
+</LinearLayout>

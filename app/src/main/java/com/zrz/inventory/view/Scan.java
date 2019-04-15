@@ -1,6 +1,8 @@
 package com.zrz.inventory.view;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
@@ -8,29 +10,30 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.*;
 import com.zrz.inventory.R;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
 import com.zrz.inventory.bean.*;
 import com.zrz.inventory.fragment.BaseTabFragmentActivity;
+import com.zrz.inventory.fragment.KeyDwonFragment;
 import com.zrz.inventory.presenter.ReceiptsDetailPresenter;
 import com.zrz.inventory.presenter.UploadPresenter;
+import com.zrz.inventory.tools.MD5Util;
 import com.zrz.inventory.tools.StringUtils;
 import com.zrz.inventory.tools.UIHelper;
 import com.zrz.inventory.view.viewinter.UploadView;
 import com.zrz.inventory.view.viewinter.ViewReceipts;
 import com.zrz.inventory.widget.LoadListView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 
-public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadListView.ILoadListener, UploadView {
+public class Scan extends BaseTabFragmentActivity implements ViewReceipts, UploadView {
 
     private boolean loopFlag = false;
-    private int inventoryFlag = 0;
+    private int inventoryFlag = 1;
 
     private ArrayList<HashMap<String, String>> tagList;
     private SimpleAdapter adapter;
@@ -44,9 +47,10 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
     private ListView LvTags;
     private Scan mContext = this;
     private HashMap<String, String> map;
+    private ReceiptsDetail receiptsDetail;
     private EditText editText;
     private ImageView back;
-    private LoadListView listView;
+    private ListView listView;
 
     private List<ReceiptsDetail> receiptsDetails = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
@@ -65,7 +69,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
         // 初始化页面
         initView();
         initSound();
-        //initUHF();
+        initUHF();
         initData();
         initViewPager();
         initViewPageData();
@@ -78,16 +82,15 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
     protected void initData() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        LoginResp loginResp = (LoginResp) bundle.getSerializable("login");
         Receipts receipts = (Receipts) bundle.getSerializable("receipts");
         receiptsId = receipts.getId();
         //Toast.makeText(Scan.this, loginResp.getMessage(), Toast.LENGTH_LONG).show();
         code.setText(receipts.getNumber());
-        count.setText(receipts.getCount());
+        count.setText("0");
         matched.setText(receipts.getMatched());
 
-        presenter.find(receiptsId, currentPage, pageSize);
-
+        receiptsDetails.add(new ReceiptsDetail());
+        //presenter.find(receiptsId, currentPage, pageSize);
     }
 
     @Override
@@ -101,6 +104,8 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
         viewPagerAdapter = new ViewPagerAdapter(this, receiptsDetails);
         listView.setAdapter(viewPagerAdapter);
         listView.setSelection(1);
+        receiptsDetails.clear();
+        viewPagerAdapter.notifyDataSetChanged();
     }
 
     private HashMap<Integer, Integer> soundMap = new HashMap<>(16);
@@ -150,7 +155,6 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
         scan = findViewById(R.id.scan);
         upload = findViewById(R.id.upload);
         listView = findViewById(R.id.list_item);
-        listView.setInterface(this);
         tagList = new ArrayList<>(10);
 
     }
@@ -172,21 +176,36 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
     public void successHint(Map<String, Object> response, String tag) {
         if (tag.equals("find")) {
             List<ReceiptsDetail> receiptsDetailList = (List<ReceiptsDetail>) response.get("receiptsDetailList");
-            if (receiptsDetailList.size() > 0){
+            if (receiptsDetailList.size() > 0) {
                 receiptsDetails.addAll(receiptsDetailList);
 
-                count.setText(receiptsDetailList.size()+"");
+                count.setText(receiptsDetailList.size() + "");
                 viewPagerAdapter.notifyDataSetChanged();
-            }else{
-                if(currentPage > 1){
+            } else {
+                if (currentPage > 1) {
                     Toast.makeText(this, "已经到底线了", Toast.LENGTH_SHORT).show();
                 }
             }
         }
-        if (tag.equals("scan")){
-            Toast.makeText(this, (String)response.get("message"), Toast.LENGTH_SHORT).show();
-            viewPagerAdapter.notifyDataSetChanged();
-            //presenter.find(receiptsId, currentPage, pageSize);
+
+        if (tag.equals("refresh")) {
+            List<ReceiptsDetail> receiptsDetailList = (List<ReceiptsDetail>) response.get("receiptsDetailList");
+            if (receiptsDetailList.size() > 0) {
+                receiptsDetails.addAll(receiptsDetailList);
+                count.setText(receiptsDetailList.size() + "");
+
+                receiptsDetails.clear();
+                receiptsDetails.addAll(receiptsDetailList);
+                viewPagerAdapter.notifyDataSetChanged();
+            }
+        }
+
+        if (tag.equals("scan")) {
+            Toast.makeText(this, (String) response.get("message"), Toast.LENGTH_SHORT).show();
+            if (receiptsDetails.size() >= pageSize) {
+                currentPage++;
+            }
+            presenter.refresh(receiptsId, currentPage, pageSize);
         }
     }
 
@@ -195,26 +214,6 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
         if (tag.equals("find")) {
             viewPagerAdapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public void onLoad() {
-        //获取更多数据
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // 下一页
-                currentPage++;
-                presenter.find(receiptsId, currentPage, pageSize);
-
-                listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-                listView.setStackFromBottom(true);
-                //通知listView加载完毕，底部布局消失
-                listView.loadComplete();
-            }
-
-        }, 500);
     }
 
     @Override
@@ -227,28 +226,87 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
 
     }
 
-    public class UploadClickListener implements View.OnClickListener{
+    public class UploadClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
-            uploadPresenter.onCreate();
-            uploadPresenter.attachView(uploadView);
-            Upload upload = new Upload();
-            upload.setJhKey("");
-            upload.setRfidData("");
-            upload.setSign("");
-            upload.setTimestamp("");
-            uploadPresenter.rfidAdd(upload);
+            if (tagList.size() > 0) {
+
+                uploadPresenter.onCreate();
+                uploadPresenter.attachView(uploadView);
+
+                SharedPreferences sharedPreferences = getSharedPreferences("login", Context.MODE_PRIVATE);
+                //(key,若无数据需要赋的值)
+                String keyName = sharedPreferences.getString("keyName", null);
+                String secretName = sharedPreferences.getString("secretName", null);
+                String token = sharedPreferences.getString("token", null);
+                String loginUuid = sharedPreferences.getString("loginUuid", null);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Map<String, String> map : tagList) {
+                    String tagUii = map.get("tagUii");
+                    stringBuilder.append(tagUii);
+                    stringBuilder.append(",");
+                }
+                Map<String, Object> map = new HashMap<>(16);
+                map.put("timestamp", System.currentTimeMillis());
+                map.put("jhSecret", secretName);
+                map.put("rfidData", stringBuilder.substring(0, stringBuilder.length() - 1));
+                //map.put("token", token);
+                map.put("sign", createSign(map));
+                map.remove("jhSecret");
+                map.put("jhKey", keyName);
+                uploadPresenter.rfidAdd(token, map);
+            }else {
+                Toast.makeText(Scan.this, "请先扫描标签", Toast.LENGTH_LONG).show();
+            }
         }
+    }
+
+    /**
+     * 参数有：timestamp，jhSecret（登陆时返回的secretName），rfidData
+     * 签名说明：1.将参数名按升序形式排序，
+     * 2.对参数拼接成 XXX=XXX&XXX=XXXX 字符串的形式，
+     * 3.用MD5进行加密形成sign签名数据，最终将字符串转换为大写
+     *
+     * @return
+     */
+    public String createSign(Map<String, Object> map) {
+        Object[] keyArr = sortMap(map);
+        StringBuilder temp = new StringBuilder();
+        for (int i = 0; i < keyArr.length; i++) {
+            temp.append(keyArr[i] + "=" + map.get(keyArr[i]) + "&");
+        }
+        String sign = temp.substring(0, temp.length() - 1);
+        sign = MD5Util.MD5(sign);
+        return sign.toUpperCase();
+    }
+
+    public Object[] sortMap(Map<String, Object> map) {
+        Set<String> keysSet = map.keySet();
+        Object[] keys = keysSet.toArray();
+        Arrays.sort(keys);
+        return keys;
     }
 
     private UploadView uploadView = new UploadView() {
         @Override
-        public void onSuccess(ResponseObject object) {
+        public void onSuccess(final ResponseObject object) {
             String code = object.getCode();
-            if ("200".equals(code)){
-                Toast.makeText(Scan.this, "upload success", Toast.LENGTH_LONG).show();
-            }else{
+            if ("200".equals(code)) {
+                Toast.makeText(Scan.this, object.getMessage(), Toast.LENGTH_LONG).show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        List<Response> responses = object.getList();
+                        load(responses);
+                        viewPagerAdapter.notifyDataSetChanged();
+                    }
+                }, 100);
+            } else {
                 Toast.makeText(Scan.this, object.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
@@ -259,23 +317,46 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
         }
     };
 
+    public void load(List<Response> list) {
+        List<ReceiptsDetail> receiptsDetailList = new ArrayList<>(10);
+        for (ReceiptsDetail receiptsDetail : receiptsDetails) {
+            String item4 = receiptsDetail.getItem4();
+            for (Response response : list) {
+                String code = response.getCode();
+                String rfidData = response.getRfid_data();
+                if ("200".equals(code) && rfidData.equals(item4)) {
+                    receiptsDetail.setItem1(response.getPacket_num());
+                    receiptsDetail.setItem2(response.getNew_area());
+                    receiptsDetail.setItem3(response.getMatch_state());
+                    receiptsDetailList.add(receiptsDetail);
+                }
+            }
+        }
+        if (receiptsDetailList.size() > 0){
+            for (ReceiptsDetail receiptsDetail : receiptsDetailList){
+                presenter.add(receiptsDetail);
+            }
+        }
+    }
+
     public class ScanClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            //readTag();
-            ReceiptsDetail receiptsDetail = new ReceiptsDetail();
+            readTag();
+            /*ReceiptsDetail receiptsDetail = new ReceiptsDetail();
             receiptsDetail.setReceiptsId(receiptsId);
             receiptsDetail.setItem1("item1" + (int) (Math.random() * 10 + 1));
             receiptsDetail.setItem2("item2" + (int) (Math.random() * 10 + 2));
             receiptsDetail.setItem3("item3" + (int) (Math.random() * 10 + 3));
             receiptsDetail.setItem4(""+System.currentTimeMillis() +""+ (Math.random() * 1000));
-            presenter.add(receiptsDetail);
+            presenter.add(receiptsDetail);*/
         }
     }
 
     private void readTag() {
         // 识别标签
         if (scan.getText().equals(this.getString(R.string.scan))) {
+            scan.setText("扫描中....");
             switch (inventoryFlag) {
                 // 单步
                 case 0: {
@@ -283,7 +364,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
                     if (!TextUtils.isEmpty(strUII)) {
                         String strEPC = this.mReader.convertUiiToEPC(strUII);
                         addEPCToList(strEPC, "N/A");
-                        count.setText("" + adapter.getCount());
+                        count.setText("" + viewPagerAdapter.getCount());
                     } else {
                         UIHelper.toastMessage(this, R.string.uhf_msg_inventory_fail);
                     }
@@ -292,7 +373,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
                 // 单标签循环
                 case 1: {
                     if (this.mReader.startInventoryTag((byte) 0, (byte) 0)) {
-                        scan.setText(this.getString(R.string.title_stop_Inventory));
+                        scan.setText(this.getString(R.string.title_stop_scan));
                         loopFlag = true;
                         setViewEnabled(false);
                         new TagThread().start();
@@ -305,6 +386,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
                 default:
                     break;
             }
+            scan.setText(this.getString(R.string.scan));
         } else {// 停止识别
             stopInventory();
         }
@@ -332,16 +414,29 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
             map.put("tagCount", String.valueOf(1));
             map.put("tagRssi", rssi);
 
+            receiptsDetail = new ReceiptsDetail();
+            // 包号
+            receiptsDetail.setItem1("");
+            // 面积
+            receiptsDetail.setItem2("");
+            // 状态
+            receiptsDetail.setItem3("");
+            // rfid
+            receiptsDetail.setItem4(epc);
+
             if (index == -1) {
+                receiptsDetails.add(receiptsDetail);
                 tagList.add(map);
-                LvTags.setAdapter(adapter);
-                count.setText("" + adapter.getCount());
+                listView.setAdapter(viewPagerAdapter);
+                count.setText("" + viewPagerAdapter.getCount());
+                mContext.playSound(1);
             } else {
                 int tagcount = Integer.parseInt(tagList.get(index).get("tagCount"), 10) + 1;
                 map.put("tagCount", String.valueOf(tagcount));
                 tagList.set(index, map);
+                mContext.playSound(2);
             }
-            adapter.notifyDataSetChanged();
+            viewPagerAdapter.notifyDataSetChanged();
         }
     }
 
@@ -358,7 +453,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
             loopFlag = false;
             setViewEnabled(true);
             if (this.mReader.stopInventory()) {
-                scan.setText(this.getString(R.string.btInventory));
+                scan.setText(this.getString(R.string.btScan));
             } else {
                 UIHelper.toastMessage(this, R.string.uhf_msg_inventory_stop_fail);
             }
@@ -401,7 +496,8 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
                 if (res != null) {
                     strTid = res[0];
                     if (!strTid.equals("0000000000000000") && !strTid.equals("000000000000000000000000")) {
-                        strResult = "TID:" + strTid + "\n";
+                        //strResult = "TID:" + strTid + "\n";
+                        strResult = strTid;
                     } else {
                         strResult = "";
                     }
@@ -411,6 +507,19 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, LoadL
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == 139 ||keyCode == 280) {
+            if (event.getRepeatCount() == 0) {
+                readTag();
+            }else{
+                //stopInventory();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private Handler handler = new Handler() {

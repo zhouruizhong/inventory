@@ -66,6 +66,38 @@ public class ReceiptsDetailPresenter {
         });
     }
 
+    public void refresh(Integer receiptsId, Integer currentPage, Integer pageSize){
+        modelInter.find(receiptsId, currentPage, pageSize, new OnRequestListener(){
+            @Override
+            public void success(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsDetailList", (List<ReceiptsDetail>)object);
+                        viewReceipts.successHint(response,"refresh");
+                    }
+                }, 500);
+            }
+
+            @Override
+            public void fail(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsDetailList", (List<ReceiptsDetail>)object);
+                        viewReceipts.successHint(response,"refresh");
+                    }
+                }, 500);
+            }
+        });
+    }
+
     public void add(final ReceiptsDetail receiptsDetail){
         modelInter.add(receiptsDetail, new OnRequestListener() {
             @Override
@@ -100,4 +132,37 @@ public class ReceiptsDetailPresenter {
         });
     }
 
+    public void batchAdd(final Integer receiptsId, final List<ReceiptsDetail> receiptsDetailList){
+        modelInter.batchAdd(receiptsId, receiptsDetailList, new OnRequestListener() {
+            @Override
+            public void success(final Object object) {
+                receiptsInter.updateMatchedById(receiptsId, receiptsDetailList.size());
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("message", "匹配成功");
+                        //返回成功状态信息
+                        viewReceipts.successHint(response,"batch");
+                    }
+                }, 500);
+            }
+
+            @Override
+            public void fail(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("message", "匹配失败");
+                        //返回失败状态信息
+                        viewReceipts.failHint(response,"batch");
+                    }
+                }, 500);
+            }
+        });
+    }
 }

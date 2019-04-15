@@ -30,6 +30,25 @@ public class ReceiptsDetailInterImpl implements ReceiptsDetailInter {
         }
     }
 
+    public Boolean isExist(Integer receiptsId, String rfidData){
+        return null == receiptsDetailDao.findByRfid(receiptsId, rfidData);
+    }
+
+    @Override
+    public void batchAdd(Integer receiptsId, List<ReceiptsDetail> receiptsDetailList, OnRequestListener listener) {
+        try{
+            for (ReceiptsDetail receiptsDetail : receiptsDetailList){
+                String rfidData = receiptsDetail.getItem4();
+                if (isExist(receiptsId, rfidData)){
+                    receiptsDetailDao.add(receiptsDetail);
+                }
+            }
+            listener.success(receiptsDetailList);
+        }catch (Exception e){
+            listener.fail(receiptsDetailList);
+        }
+    }
+
     @Override
     public void find(Integer receiptsId, Integer currentPage, Integer pageSize, OnRequestListener listener) {
         try{

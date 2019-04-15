@@ -8,22 +8,21 @@
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:paddingTop="10dp"
+            android:layout_height="30dp"
+            android:paddingTop="5dp"
             android:orientation="horizontal">
 
         <ImageView
                 android:src="@mipmap/back"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:padding="3dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:gravity="left"
                 android:id="@+id/inventory_back"/>
 
         <TextView
                 android:text="@string/inventory_scan"
                 android:layout_width="0dp"
-                android:layout_height="24dp"
+                android:layout_height="22dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:id="@+id/inventory_scan"
@@ -32,22 +31,22 @@
     </LinearLayout>
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="5dp"
             android:orientation="vertical"
-            android:background="@drawable/card_shape"
-            >
+            android:background="@drawable/card_shape">
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="25dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:orientation="horizontal">
             <TextView
                     android:text="AAAA"
                     android:layout_width="0dp"
-                    android:layout_height="22dp"
+                    android:layout_height="25dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:id="@+id/code_num"
@@ -55,7 +54,7 @@
             <TextView
                     android:text="AAAA"
                     android:layout_width="0dp"
-                    android:layout_height="22dp"
+                    android:layout_height="25dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:id="@+id/count_num"
@@ -63,7 +62,7 @@
             <TextView
                     android:text="AAA"
                     android:layout_width="0dp"
-                    android:layout_height="22dp"
+                    android:layout_height="25dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:id="@+id/matched_num"
@@ -71,7 +70,7 @@
         </LinearLayout>
         <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="25dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:orientation="horizontal">
@@ -79,21 +78,21 @@
             <TextView
                     android:text="@string/code"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="20dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:id="@+id/code"/>
             <TextView
                     android:text="@string/count"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="20dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:id="@+id/count"/>
             <TextView
                     android:text="@string/matched"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="20dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:id="@+id/matched"/>
@@ -101,11 +100,11 @@
     </LinearLayout>
 
     <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="350dp"
             android:layout_margin="5dp"
             android:orientation="vertical">
-        <com.zrz.inventory.widget.LoadListView
+        <ListView
                 android:id="@+id/list_item"
                 android:scrollbars="vertical"
                 android:fadingEdge="vertical"

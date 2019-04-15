@@ -15,7 +15,7 @@ public class Upload implements Serializable {
     /**
      * 时间戳，签名和参数的时间戳要一致
      */
-    private String timestamp;
+    private Long timestamp;
     /**
      * RFID值，多个值之间用英文逗号分隔
      */
@@ -26,6 +26,7 @@ public class Upload implements Serializable {
     }
 
     public void setSign(String sign) {
+        String stringSignTemp = "";
         this.sign = sign;
     }
 
@@ -37,11 +38,11 @@ public class Upload implements Serializable {
         this.jhKey = jhKey;
     }
 
-    public String getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 

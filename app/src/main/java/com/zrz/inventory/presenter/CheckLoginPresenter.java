@@ -116,6 +116,8 @@ public class CheckLoginPresenter {
                         String code = "200";
                         if (mLoginResp != null && code.equals(mLoginResp.getCode())) {
                             mLoginRespView.onSuccess(mLoginResp);
+                        }else{
+                            mLoginRespView.onError("timeout");
                         }
                     }
 
