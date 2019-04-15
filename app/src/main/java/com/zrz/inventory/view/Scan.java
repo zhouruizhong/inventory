@@ -366,6 +366,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                         addEPCToList(strEPC, "N/A");
                         count.setText("" + viewPagerAdapter.getCount());
                     } else {
+                        scan.setText(this.getString(R.string.scan));
                         UIHelper.toastMessage(this, R.string.uhf_msg_inventory_fail);
                     }
                 }
@@ -379,6 +380,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                         new TagThread().start();
                     } else {
                         mContext.mReader.stopInventory();
+                        scan.setText(this.getString(R.string.scan));
                         UIHelper.toastMessage(mContext, R.string.uhf_msg_inventory_open_fail);
                     }
                 }
@@ -386,10 +388,28 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                 default:
                     break;
             }
-            scan.setText(this.getString(R.string.scan));
+            //scan.setText(this.getString(R.string.scan));
         } else {// 停止识别
             stopInventory();
         }
+    }
+
+    public static void main(String[] args) {
+        int inventoryFlag = 1;
+        System.out.println("-------------------------------开始扫描-----------------------------");
+        switch (inventoryFlag){
+            case 0:
+                System.out.println("-------------------------------单次扫描-----------------------------");
+                break;
+            case 1:
+                System.out.println("-------------------------------循环扫描-----------------------------");
+                break;
+            default:
+                System.out.println("-------------------------------默认扫描-----------------------------");
+                break;
+        }
+        System.out.println("-------------------------------扫描结束-----------------------------");
+
     }
 
     @Override
@@ -429,12 +449,12 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                 tagList.add(map);
                 listView.setAdapter(viewPagerAdapter);
                 count.setText("" + viewPagerAdapter.getCount());
-                mContext.playSound(1);
+                //mContext.playSound(1);
             } else {
                 int tagcount = Integer.parseInt(tagList.get(index).get("tagCount"), 10) + 1;
                 map.put("tagCount", String.valueOf(tagcount));
                 tagList.set(index, map);
-                mContext.playSound(2);
+                //mContext.playSound(2);
             }
             viewPagerAdapter.notifyDataSetChanged();
         }
@@ -453,7 +473,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
             loopFlag = false;
             setViewEnabled(true);
             if (this.mReader.stopInventory()) {
-                scan.setText(this.getString(R.string.btScan));
+                scan.setText(this.getString(R.string.scan));
             } else {
                 UIHelper.toastMessage(this, R.string.uhf_msg_inventory_stop_fail);
             }
@@ -502,7 +522,8 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                         strResult = "";
                     }
                     Message msg = handler.obtainMessage();
-                    msg.obj = strResult + "EPC:" + mContext.mReader.convertUiiToEPC(res[1]) + "@" + res[2];
+                    //msg.obj = strResult + "EPC:" + mContext.mReader.convertUiiToEPC(res[1]) + "@" + res[2];
+                    msg.obj = strResult + mContext.mReader.convertUiiToEPC(res[1]) + "@" + res[2];
                     handler.sendMessage(msg);
                 }
             }
@@ -514,12 +535,21 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
         if (keyCode == 139 ||keyCode == 280) {
             if (event.getRepeatCount() == 0) {
                 readTag();
-            }else{
-                //stopInventory();
             }
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == 139 ||keyCode == 280) {
+            if (event.getRepeatCount() == 0) {
+                stopInventory();
+            }
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
     }
 
     private Handler handler = new Handler() {
