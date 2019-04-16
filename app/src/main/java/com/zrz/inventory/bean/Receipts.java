@@ -26,6 +26,10 @@ public class Receipts implements Serializable {
      */
     private String count;
 
+    public Receipts(){
+
+    }
+
     public Integer getId() {
         return id;
     }

@@ -32,7 +32,9 @@
                 android:layout_width="22dp"
                 android:layout_height="22dp"/>
     </LinearLayout>
-
+    <View  android:layout_height="1px"
+           android:layout_width="match_parent"
+           android:background="@color/blue3"/>
     <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="460dp"
@@ -46,8 +48,18 @@
                         android:layout_width="match_parent"
                         android:layout_margin="2dp"
                         android:divider="@android:color/transparent"
-                        android:dividerHeight="8dp"
+                        android:dividerHeight="5dp"
                         android:layout_height="450dp"
                         />
+        <TextView
+                android:id="@+id/receipts_no_data"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/msg_no_data"
+                android:visibility="invisible"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:ems="18"/>
     </LinearLayout>
 </LinearLayout>

@@ -56,7 +56,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
     private ViewPagerAdapter viewPagerAdapter;
     private Integer currentPage = 1;
     private Integer pageSize = 10;
-    private ReceiptsDetailPresenter presenter;
+    private ReceiptsDetailPresenter presenter = new ReceiptsDetailPresenter(this, Scan.this);
     private UploadPresenter uploadPresenter = new UploadPresenter(this, Scan.this);
     private Integer receiptsId;
 
@@ -65,18 +65,37 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan);
 
-        presenter = new ReceiptsDetailPresenter(this, Scan.this);
         // 初始化页面
         initView();
         initSound();
         initUHF();
         initData();
         initViewPager();
-        initViewPageData();
+        //initViewPageData();
 
         //事件
         event();
+        // 程序崩溃时触发线程  以下用来捕获程序崩溃异常
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+    }
 
+    /**
+     * 创建服务用于捕获崩溃异常
+     */
+    private Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
+        @Override
+        public void uncaughtException(Thread thread, Throwable ex) {
+            ex.printStackTrace();
+            restartApp();//发生崩溃异常时,重启应用
+        }
+    };
+
+    public void restartApp(){
+        Intent intent = new Intent(this,Scan.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        //结束进程之前可以把你程序的注销或者退出代码放在这段代码之前
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     protected void initData() {
@@ -84,18 +103,17 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
         Bundle bundle = intent.getExtras();
         Receipts receipts = (Receipts) bundle.getSerializable("receipts");
         receiptsId = receipts.getId();
-        //Toast.makeText(Scan.this, loginResp.getMessage(), Toast.LENGTH_LONG).show();
         code.setText(receipts.getNumber());
         count.setText("0");
         matched.setText(receipts.getMatched());
 
-        receiptsDetails.add(new ReceiptsDetail());
+        //receiptsDetails.add(new ReceiptsDetail());
         //presenter.find(receiptsId, currentPage, pageSize);
     }
 
     @Override
     protected void initViewPageData() {
-        viewPagerAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -104,8 +122,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
         viewPagerAdapter = new ViewPagerAdapter(this, receiptsDetails);
         listView.setAdapter(viewPagerAdapter);
         listView.setSelection(1);
-        receiptsDetails.clear();
-        viewPagerAdapter.notifyDataSetChanged();
+        listView.setEmptyView(findViewById(R.id.no_data));
     }
 
     private HashMap<Integer, Integer> soundMap = new HashMap<>(16);
@@ -250,11 +267,8 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                 }
                 Map<String, Object> map = new HashMap<>(16);
                 map.put("timestamp", System.currentTimeMillis());
-                map.put("jhSecret", secretName);
                 map.put("rfidData", stringBuilder.substring(0, stringBuilder.length() - 1));
-                //map.put("token", token);
                 map.put("sign", createSign(map));
-                map.remove("jhSecret");
                 map.put("jhKey", keyName);
                 uploadPresenter.rfidAdd(token, map);
             }else {
@@ -394,24 +408,6 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
         }
     }
 
-    public static void main(String[] args) {
-        int inventoryFlag = 1;
-        System.out.println("-------------------------------开始扫描-----------------------------");
-        switch (inventoryFlag){
-            case 0:
-                System.out.println("-------------------------------单次扫描-----------------------------");
-                break;
-            case 1:
-                System.out.println("-------------------------------循环扫描-----------------------------");
-                break;
-            default:
-                System.out.println("-------------------------------默认扫描-----------------------------");
-                break;
-        }
-        System.out.println("-------------------------------扫描结束-----------------------------");
-
-    }
-
     @Override
     public void onPause() {
         Log.i("MY", "UHFReadTagFragment.onPause");
@@ -449,12 +445,10 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                 tagList.add(map);
                 listView.setAdapter(viewPagerAdapter);
                 count.setText("" + viewPagerAdapter.getCount());
-                //mContext.playSound(1);
             } else {
                 int tagcount = Integer.parseInt(tagList.get(index).get("tagCount"), 10) + 1;
                 map.put("tagCount", String.valueOf(tagcount));
                 tagList.set(index, map);
-                //mContext.playSound(2);
             }
             viewPagerAdapter.notifyDataSetChanged();
         }

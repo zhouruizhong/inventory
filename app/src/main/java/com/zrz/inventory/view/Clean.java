@@ -42,6 +42,7 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
     private List<Receipts> receiptsList = new ArrayList<>();
     private ViewListAdapter viewListAdapter;
     private List<Integer> indexs = new ArrayList<>(10);
+    private List<Integer> positions = new ArrayList<>(10);
     private Integer currentPage = 1;
     private Integer pageSize = 5;
 
@@ -72,17 +73,21 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
         viewListAdapter = new ViewListAdapter(this, receiptsList);
         listView.setAdapter(viewListAdapter);
         listView.setSelection(1);
+        listView.setEmptyView(findViewById(R.id.clean_no_data));
     }
 
     public void event() {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(viewListAdapter.isItemSelected(position)){
-                    viewListAdapter.removeselected();
+                Receipts receipts = (Receipts) listView.getItemAtPosition(position);
+                if (positions.contains(position)) {
+                    indexs.remove(receipts.getId());
+                    positions.remove((Integer) position);
                     view.setBackgroundColor(0);
-                }else{
-                    viewListAdapter.addSelected(position);
+                } else {
+                    indexs.add(receipts.getId());
+                    positions.add(position);
                     view.setBackgroundColor(getResources().getColor(R.color.blue3));
                 }
                 viewListAdapter.notifyDataSetInvalidated();
@@ -100,7 +105,7 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
             @Override
             public void onClick(View v) {
                 final List<Integer> selectList = viewListAdapter.getSelectList();
-                if (selectList.size() == 0) {
+                if (indexs.size() == 0) {
                     Toast.makeText(Clean.this, "请您先选中一行！", Toast.LENGTH_SHORT).show();
                 } else {
                     //    通过AlertDialog.Builder这个类来实例化我们的一个AlertDialog的对象
@@ -111,7 +116,7 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
                     builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            presenter.delete(selectList);
+                            presenter.delete(indexs);
                         }
                     });
                     //    设置一个NegativeButton
@@ -133,11 +138,30 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
         checkAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewListAdapter.removeselected();
-                for (Receipts receipts: receiptsList){
-                    viewListAdapter.addSelected(receipts.getId());
+                if (positions.size() < receiptsList.size()) {
+                    int count = viewListAdapter.getCount();
+                    for (int i = 0; i < count; i++) {
+                        if (!positions.contains((Integer) i)) {
+                            positions.add(i);
+                            indexs.add(receiptsList.get(i).getId());
+                            View view = getViewByPosition(i, listView);
+                            view.setBackgroundColor(getResources().getColor(R.color.blue3));
+                        }
+                    }
+                    viewListAdapter.notifyDataSetInvalidated();
+                    return;
                 }
-                viewListAdapter.notifyDataSetInvalidated();
+
+                if (positions.size() == receiptsList.size()) {
+                    for (Integer integer : positions) {
+                        View view = getViewByPosition(integer, listView);
+                        view.setBackgroundColor(0);
+                    }
+                    positions.clear();
+                    indexs.clear();
+                    viewListAdapter.notifyDataSetInvalidated();
+                    return;
+                }
             }
         });
     }
@@ -153,11 +177,13 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
                 if (currentPage > 1) {
                     Toast.makeText(this, "没有更多了!", Toast.LENGTH_SHORT).show();
                     viewListAdapter.notifyDataSetChanged();
+                }else{
+                    Toast.makeText(this, "您还没有添加数据!", Toast.LENGTH_SHORT).show();
                 }
             }
         }
 
-        if (tag.equals("refresh")){
+        if (tag.equals("refresh")) {
             List<Receipts> receipts = (List<Receipts>) response.get("receiptsList");
             receiptsList.clear();
             receiptsList.addAll(receipts);
@@ -166,7 +192,41 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
 
         if (tag.equals("delete")) {
             Toast.makeText(this, (String) response.get("message"), Toast.LENGTH_SHORT).show();
-            presenter.refresh(currentPage, pageSize);
+
+            List<Receipts> removeList = new ArrayList<>(10);
+            List<Integer> ids = (List<Integer>) response.get("id");
+            for (Receipts receipts : receiptsList) {
+                int id = receipts.getId();
+                for (int integer : ids) {
+                    if (id == integer) {
+                        removeList.add(receipts);
+                    }
+                }
+            }
+            for (Receipts receipts : removeList) {
+                receiptsList.remove(receipts);
+            }
+            viewListAdapter.notifyDataSetChanged();
+            //presenter.refresh(currentPage, pageSize);
+        }
+    }
+
+    /**
+     * 获取listView中item的布局
+     *
+     * @param pos      位置
+     * @param listView listView
+     * @return
+     */
+    private View getViewByPosition(int pos, ListView listView) {
+        final int firstListItemPosition = listView.getFirstVisiblePosition();
+        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+        if (pos < firstListItemPosition || pos > lastListItemPosition) {
+            return listView.getAdapter().getView(pos, null, listView);
+        } else {
+            final int childIndex = pos - firstListItemPosition;
+            return listView.getChildAt(childIndex);
         }
     }
 

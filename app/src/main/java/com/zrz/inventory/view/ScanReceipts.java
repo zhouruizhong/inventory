@@ -78,6 +78,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
         viewListAdapter = new ViewListAdapter(this, receiptsList);
         listView.setAdapter(viewListAdapter);
         listView.setSelection(1);
+        listView.setEmptyView(findViewById(R.id.receipts_no_data));
     }
 
     public class ButtonOnClickListener implements View.OnClickListener {

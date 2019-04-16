@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.zrz.inventory.R;
 import com.zrz.inventory.bean.LoginResp;
@@ -27,6 +29,9 @@ public class Index extends Activity implements UuidView {
 
     private static final String TAG = "Rxjava";
     private ImageView qrCode;
+    private TextView txInvalid;
+    private TextView txScan;
+    private Button btnRefresh;
     private IndexPresenter presenter;
     private String uuid;
 
@@ -55,11 +60,16 @@ public class Index extends Activity implements UuidView {
                 presenter.getUuid();
             }
         });
+
+
     }
 
     private void initView() {
         // 二维码显示区
-        qrCode = findViewById(R.id.qrCode);
+        qrCode = findViewById(R.id.qr_code);
+        txInvalid = findViewById(R.id.qr_code_invalid);
+        txScan = findViewById(R.id.scan_tip);
+        btnRefresh = findViewById(R.id.qr_code_refresh);
         //建立与presenter层的关系，创建presenter对象
         presenter = new IndexPresenter(this, Index.this);
         presenter.onCreate();
@@ -70,6 +80,12 @@ public class Index extends Activity implements UuidView {
     @Override
     public void onSuccess(Uuid mUuid) {
         uuid = mUuid.getUuid();
+
+        qrCode.setVisibility(View.VISIBLE);
+        txScan.setVisibility(View.VISIBLE);
+        txInvalid.setVisibility(View.GONE);
+        btnRefresh.setVisibility(View.GONE);
+
         System.out.println("-----------uuid :" + uuid + ":----------------");
         // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
         new DownloadUrlBitmap().execute("https://www.jhwoods.com/loginQr/" + uuid);
@@ -82,6 +98,8 @@ public class Index extends Activity implements UuidView {
     @Override
     public void onError(String result) {
         Toast.makeText(this, "获取uuid超时,请检查网络！", Toast.LENGTH_SHORT).show();
+        txScan.setVisibility(View.GONE);
+        btnRefresh.setVisibility(View.VISIBLE);
     }
 
     private LoginRespView mLoginRespView = new LoginRespView() {
@@ -106,7 +124,10 @@ public class Index extends Activity implements UuidView {
         @Override
         public void onError(String result) {
             if ("timeout".equals(result)){
-
+                qrCode.setVisibility(View.GONE);
+                txScan.setVisibility(View.GONE);
+                txInvalid.setVisibility(View.VISIBLE);
+                btnRefresh.setVisibility(View.VISIBLE);
             }
             Toast.makeText(Index.this, "抱歉,登陆失败或您还没有登陆：" + result, Toast.LENGTH_LONG).show();
         }

@@ -29,6 +29,9 @@
                 android:textSize="18sp"/>
 
     </LinearLayout>
+    <View  android:layout_height="1px"
+           android:layout_width="match_parent"
+           android:background="@color/blue3"/>
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="90dp"
@@ -111,14 +114,17 @@
                 android:layout_width="match_parent"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="8dp"
-                android:layout_height="340dp"/>
-        <!--<EditText
-                        android:layout_width="250dp"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPersonName"
-                        android:text="Name"
-                        android:ems="10"
-                        android:id="@+id/result"/>-->
+                android:layout_height="300dp"/>
+        <TextView
+                android:id="@+id/no_data"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_weight="1"
+                android:text="@string/msg_no_data"
+                android:visibility="invisible"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:ems="18"/>
 
 
     </LinearLayout>

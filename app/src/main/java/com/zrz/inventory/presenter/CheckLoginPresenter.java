@@ -97,7 +97,7 @@ public class CheckLoginPresenter {
                             @Override
                             public Observable<?> call(Void aVoid) {
                                 // 加入判断条件：当轮询次数 = 5次后，就停止轮询
-                                if (i > 10) {
+                                if (i > 5) {
                                     // 此处选择发送onError事件以结束轮询，因为可触发下游观察者的onError（）方法回调
                                     return Observable.error(new Throwable("轮询结束"));
                                 }
