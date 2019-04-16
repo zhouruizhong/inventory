@@ -44,7 +44,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
     private List<Receipts> receiptsList = new ArrayList<>();
     private ViewListAdapter viewListAdapter;
     private Integer currentPage = 1;
-    private Integer pageSize = 5;
+    private Integer pageSize = 10;
     private LoadListView listView;
 
     @Override

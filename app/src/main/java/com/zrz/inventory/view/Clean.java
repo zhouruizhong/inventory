@@ -44,7 +44,7 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
     private List<Integer> indexs = new ArrayList<>(10);
     private List<Integer> positions = new ArrayList<>(10);
     private Integer currentPage = 1;
-    private Integer pageSize = 5;
+    private Integer pageSize = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

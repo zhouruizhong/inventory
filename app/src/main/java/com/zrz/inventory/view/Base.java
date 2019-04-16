@@ -1,28 +1,31 @@
-package com.zrz.inventory.fragment;
+package com.zrz.inventory.view;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.widget.Toast;
 import com.rscja.deviceapi.RFIDWithUHF;
 import com.rscja.utility.StringUtility;
-import com.zrz.inventory.R;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
+import com.zrz.inventory.fragment.BaseTabFragmentActivity;
+import com.zrz.inventory.fragment.KeyDwonFragment;
 import com.zrz.inventory.widget.NoScrollViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2015-03-10.
+ * @author 周瑞忠
+ * @description java类作用描述
+ * @date 2019/4/16 19:38
  */
-public class BaseTabFragmentActivity extends FragmentActivity {
+public class Base extends Activity {
 
     private final int offscreenPage = 2;
 
@@ -48,17 +51,15 @@ public class BaseTabFragmentActivity extends FragmentActivity {
     }
 
     public void initUHF() {
-        if (mReader == null){
-                try {
-                    mReader = RFIDWithUHF.getInstance();
-                } catch (Exception ex) {
-                    toastMessage(ex.getMessage());
-                    return;
-                }
-                if (mReader != null) {
-                    new InitTask().execute();
-                }
-        }
+            try {
+                mReader = RFIDWithUHF.getInstance();
+            } catch (Exception ex) {
+                toastMessage(ex.getMessage());
+                return;
+            }
+            if (mReader != null) {
+                new InitTask().execute();
+            }
     }
 
     protected void initViewPageData() {
@@ -121,7 +122,7 @@ public class BaseTabFragmentActivity extends FragmentActivity {
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             if (!result) {
-                Toast.makeText(BaseTabFragmentActivity.this, "init fail",
+                Toast.makeText(Base.this, "init fail",
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -162,5 +163,4 @@ public class BaseTabFragmentActivity extends FragmentActivity {
             //UIHelper.alert(this, R.string.action_uhf_ver, rfidVer, R.drawable.webtext);
         }
     }
-
 }

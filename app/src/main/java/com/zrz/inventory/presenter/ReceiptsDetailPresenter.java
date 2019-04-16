@@ -136,8 +136,6 @@ public class ReceiptsDetailPresenter {
         modelInter.batchAdd(receiptsId, receiptsDetailList, new OnRequestListener() {
             @Override
             public void success(final Object object) {
-                receiptsInter.updateMatchedById(receiptsId, receiptsDetailList.size());
-
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override

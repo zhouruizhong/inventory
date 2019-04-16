@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.*;
+import com.rscja.deviceapi.RFIDWithUHF;
 import com.zrz.inventory.R;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
 import com.zrz.inventory.bean.*;
@@ -30,7 +31,7 @@ import com.zrz.inventory.widget.LoadListView;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class Scan extends BaseTabFragmentActivity implements ViewReceipts, UploadView {
+public class Scan extends Base implements ViewReceipts, UploadView {
 
     private boolean loopFlag = false;
     private int inventoryFlag = 1;
@@ -75,27 +76,16 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
 
         //事件
         event();
-        // 程序崩溃时触发线程  以下用来捕获程序崩溃异常
-        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
     }
 
-    /**
-     * 创建服务用于捕获崩溃异常
-     */
-    private Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
-        @Override
-        public void uncaughtException(Thread thread, Throwable ex) {
-            ex.printStackTrace();
-            restartApp();//发生崩溃异常时,重启应用
+    @Override
+    public void initUHF() {
+        try {
+            mReader = RFIDWithUHF.getInstance();
+        } catch (Exception ex) {
+            toastMessage(ex.getMessage());
+            return;
         }
-    };
-
-    public void restartApp(){
-        Intent intent = new Intent(this,Scan.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        //结束进程之前可以把你程序的注销或者退出代码放在这段代码之前
-        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     protected void initData() {
@@ -267,8 +257,10 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                 }
                 Map<String, Object> map = new HashMap<>(16);
                 map.put("timestamp", System.currentTimeMillis());
+                map.put("jhSecret", secretName);
                 map.put("rfidData", stringBuilder.substring(0, stringBuilder.length() - 1));
                 map.put("sign", createSign(map));
+                map.remove("jhSecret");
                 map.put("jhKey", keyName);
                 uploadPresenter.rfidAdd(token, map);
             }else {
@@ -339,7 +331,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
                 String code = response.getCode();
                 String rfidData = response.getRfid_data();
                 if ("200".equals(code) && rfidData.equals(item4)) {
-                    receiptsDetail.setItem1(response.getPacket_num());
+                    receiptsDetail.setItem1(response.getContainer_num() + "-" +response.getPacket_num());
                     receiptsDetail.setItem2(response.getNew_area());
                     receiptsDetail.setItem3(response.getMatch_state());
                     receiptsDetailList.add(receiptsDetail);
@@ -347,9 +339,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
             }
         }
         if (receiptsDetailList.size() > 0){
-            for (ReceiptsDetail receiptsDetail : receiptsDetailList){
-                presenter.add(receiptsDetail);
-            }
+            presenter.batchAdd(receiptsId, receiptsDetailList);
         }
     }
 
@@ -436,7 +426,7 @@ public class Scan extends BaseTabFragmentActivity implements ViewReceipts, Uploa
             // 面积
             receiptsDetail.setItem2("");
             // 状态
-            receiptsDetail.setItem3("");
+            receiptsDetail.setItem3("未匹配");
             // rfid
             receiptsDetail.setItem4(epc);
 
