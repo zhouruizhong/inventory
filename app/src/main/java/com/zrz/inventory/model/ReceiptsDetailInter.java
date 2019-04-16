@@ -2,6 +2,8 @@ package com.zrz.inventory.model;
 
 import com.zrz.inventory.bean.ReceiptsDetail;
 
+import java.util.List;
+
 public interface ReceiptsDetailInter {
 
     /**
@@ -10,6 +12,13 @@ public interface ReceiptsDetailInter {
      * @param listener
      */
     void add(ReceiptsDetail receiptsDetail, OnRequestListener listener);
+
+    /**
+     *
+     * @param receiptsDetailList
+     * @param listener
+     */
+    void batchAdd(Integer receiptsId, List<ReceiptsDetail> receiptsDetailList, OnRequestListener listener);
 
     /**
      *

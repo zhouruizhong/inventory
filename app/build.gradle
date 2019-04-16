@@ -16,14 +16,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    
-    splits {
+
+    /*splits {
         abi {
             enable true
             reset()
             include 'x86', 'armeabi-v7a', 'x86_64'
             universalApk true
         }
+    }*/
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 

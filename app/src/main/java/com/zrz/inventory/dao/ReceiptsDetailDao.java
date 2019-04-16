@@ -15,6 +15,14 @@ public interface ReceiptsDetailDao {
     void add(ReceiptsDetail receiptsDetail);
 
     /**
+     * 查询是否已存在匹配
+     * @param receiptsId
+     * @param rfidData
+     * @return
+     */
+    ReceiptsDetail findByRfid(Integer receiptsId, String rfidData);
+
+    /**
      *
      * @return
      */

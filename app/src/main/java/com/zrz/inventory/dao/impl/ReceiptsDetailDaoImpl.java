@@ -40,6 +40,28 @@ public class ReceiptsDetailDaoImpl implements ReceiptsDetailDao {
     }
 
     @Override
+    public ReceiptsDetail findByRfid(Integer receiptsId, String rfidData) {
+        database = dbHelper.getReadableDatabase();
+        //方式一：sql语句操作数据库
+//        String sql = "select * from " + DBHelper.TABLENAME + " where " + DBHelper.COLNUMNAME + " = ?";
+//        Cursor cursor = database.rawQuery(sql, new String[]{name});
+        //方法二：封装的api操作，直接操作方法即可
+        Cursor cursor = database.query("receipts_detail", new String[]{"id", "receipts","item1","item2","item3", "item4"}, "receipts = ? and item4 = ? ", new String[]{receiptsId.toString(), rfidData}, null, null, null, null);
+        ReceiptsDetail detail = null;
+        while(cursor.moveToNext()){
+            detail = new ReceiptsDetail();
+            detail.setReceiptsId(cursor.getInt(cursor.getColumnIndex("receipts")));
+            detail.setItem1(cursor.getString(cursor.getColumnIndex("item1")));
+            detail.setItem2(cursor.getString(cursor.getColumnIndex("item2")));
+            detail.setItem3(cursor.getString(cursor.getColumnIndex("item3")));
+            detail.setItem4(cursor.getString(cursor.getColumnIndex("item4")));
+            detail.setId(cursor.getInt(cursor.getColumnIndex("id")));
+        }
+        cursor.close();
+        return detail;
+    }
+
+    @Override
     public List<ReceiptsDetail> find(Integer receiptsId, Integer currentPage, Integer pageSize) {
         List<ReceiptsDetail> list = new ArrayList<>(10);
         database = dbHelper.getReadableDatabase();

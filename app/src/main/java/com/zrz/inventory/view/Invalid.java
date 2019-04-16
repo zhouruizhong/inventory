@@ -11,8 +11,6 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.zrz.inventory.R;
 import com.zrz.inventory.bean.LoginResp;
@@ -25,13 +23,13 @@ import com.zrz.inventory.view.viewinter.UuidView;
 import java.io.IOException;
 import java.net.URL;
 
-public class Index extends Activity implements UuidView {
+/**
+ *
+ */
+public class Invalid extends Activity implements UuidView {
 
     private static final String TAG = "Rxjava";
-    private ImageView qrCode;
-    private TextView txInvalid;
-    private TextView txScan;
-    private Button btnRefresh;
+    private Button refresh;
     private IndexPresenter presenter;
     private String uuid;
 
@@ -40,66 +38,29 @@ public class Index extends Activity implements UuidView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.index);
+        setContentView(R.layout.invalid);
 
         //初始化控件
         initView();
         //初始化事件
         event();
-
-    }
-
-    private void event() {
-        /**
-         * 二维码点击时间
-         */
-        qrCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
-                presenter.getUuid();
-            }
-        });
-
-
     }
 
     private void initView() {
-        // 二维码显示区
-        qrCode = findViewById(R.id.qr_code);
-        txInvalid = findViewById(R.id.qr_code_invalid);
-        txScan = findViewById(R.id.scan_tip);
-        btnRefresh = findViewById(R.id.qr_code_refresh);
-        //建立与presenter层的关系，创建presenter对象
-        presenter = new IndexPresenter(this, Index.this);
-        presenter.onCreate();
-        presenter.attachView(this);
-        presenter.getUuid();
+        refresh = findViewById(R.id.invalid_refresh);
     }
 
-    @Override
-    public void onSuccess(Uuid mUuid) {
-        uuid = mUuid.getUuid();
+    private void event(){
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DownloadUrlBitmap().execute("https://www.jhwoods.com/loginQr/" + uuid);
 
-        qrCode.setVisibility(View.VISIBLE);
-        txScan.setVisibility(View.VISIBLE);
-        txInvalid.setVisibility(View.GONE);
-        btnRefresh.setVisibility(View.GONE);
-
-        System.out.println("-----------uuid :" + uuid + ":----------------");
-        // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
-        new DownloadUrlBitmap().execute("https://www.jhwoods.com/loginQr/" + uuid);
-
-        loginPresenter.onCreate();
-        loginPresenter.attachView(mLoginRespView);
-        loginPresenter.checkLogin(uuid);
-    }
-
-    @Override
-    public void onError(String result) {
-        Toast.makeText(this, "获取uuid超时,请检查网络！", Toast.LENGTH_SHORT).show();
-        txScan.setVisibility(View.GONE);
-        btnRefresh.setVisibility(View.VISIBLE);
+                loginPresenter.onCreate();
+                loginPresenter.attachView(mLoginRespView);
+                loginPresenter.checkLogin(uuid);
+            }
+        });
     }
 
     private LoginRespView mLoginRespView = new LoginRespView() {
@@ -107,7 +68,7 @@ public class Index extends Activity implements UuidView {
         public void onSuccess(LoginResp mLoginResp) {
             String code = "200";
             if (code.equals(mLoginResp.getCode())){
-                Intent intent = new Intent(Index.this, Main.class);
+                Intent intent = new Intent(Invalid.this, Main.class);
 
                 SharedPreferences sharedPreferences = getSharedPreferences("login", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -123,15 +84,19 @@ public class Index extends Activity implements UuidView {
 
         @Override
         public void onError(String result) {
-            if ("timeout".equals(result)){
-                qrCode.setVisibility(View.GONE);
-                txScan.setVisibility(View.GONE);
-                txInvalid.setVisibility(View.VISIBLE);
-                btnRefresh.setVisibility(View.VISIBLE);
-            }
-            Toast.makeText(Index.this, "抱歉,登陆失败或您还没有登陆：" + result, Toast.LENGTH_LONG).show();
+            Toast.makeText(Invalid.this, "抱歉,登陆失败或您还没有登陆：" + result, Toast.LENGTH_LONG).show();
         }
     };
+
+    @Override
+    public void onSuccess(Uuid mUuid) {
+
+    }
+
+    @Override
+    public void onError(String result) {
+
+    }
 
     private class DownloadUrlBitmap extends AsyncTask<String, Void, Bitmap> {
         @Override
@@ -141,7 +106,7 @@ public class Index extends Activity implements UuidView {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            qrCode.setImageBitmap(bitmap);
+            //qrCode.setImageBitmap(bitmap);
         }
     }
 

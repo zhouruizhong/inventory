@@ -59,8 +59,40 @@ public class ReceiptsPresenter {
                     public void run() {
                         //返回成功状态信息
                         Map<String, Object> response = new HashMap<>(16);
-                        response.put("", (List<Receipts>)object);
+                        response.put("receiptsList", (List<Receipts>)object);
                         viewReceipts.successHint(response,"findAll");
+                    }
+                }, 500);
+            }
+        });
+    }
+
+    public void refresh(Integer currentPage, Integer pageSize){
+        modelInter.findAll(currentPage, pageSize, new OnRequestListener(){
+            @Override
+            public void success(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsList", (List<Receipts>)object);
+                        viewReceipts.successHint(response,"refresh");
+                    }
+                }, 500);
+            }
+
+            @Override
+            public void fail(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //返回成功状态信息
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsList", (List<Receipts>)object);
+                        viewReceipts.successHint(response,"refresh");
                     }
                 }, 500);
             }
@@ -78,6 +110,8 @@ public class ReceiptsPresenter {
                         Map<String, Object> response = new HashMap<>(16);
                         Receipts receipts = new Receipts();
                         receipts.setNumber(number);
+                        receipts.setCount("0");
+                        receipts.setMatched("0");
 
                         response.put("receipts", receipts);
                         //返回成功状态信息
@@ -105,7 +139,7 @@ public class ReceiptsPresenter {
         });
     }
 
-    public void delete(List<Integer> id){
+    public void delete(final List<Integer> id){
         modelInter.delete(id, new OnRequestListener() {
             @Override
             public void success(Object object) {
@@ -115,6 +149,7 @@ public class ReceiptsPresenter {
                     public void run() {
                         Map<String, Object> response = new HashMap<>(16);
                         response.put("message", "删除成功");
+                        response.put("id", id);
                         //返回成功状态信息
                         viewReceipts.successHint(response,"delete");
                     }

@@ -10,7 +10,8 @@
     <string name="password">请输入密码</string>
     <string name="title_activity_index">Index</string>
     <string name="qrcode">二维码</string>
-    <string name="app_name">木智云</string>
+    <string name="qrcode_timeout">请点击刷新</string>
+    <string name="app_name">木智云RFID版</string>
     <string name="scan_login">扫一扫登录</string>
     <string name="logo">标志</string>
     <string name="qr_code" translatable="false">二维码</string>
@@ -35,5 +36,8 @@
     <string name="title_activity_inventory">Inventory</string>
     <string name="title_activity_scan_receipts">ScanReceipts</string>
     <string name="title_activity_clean">Clean</string>
+    <string name="title_activity_invalid">Invalid</string>
+    <string name="invalid_code">二维码已失效</string>
+    <string name="click_refresh">请点击刷新</string>
 
 </resources>

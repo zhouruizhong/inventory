@@ -7,6 +7,8 @@ import com.zrz.inventory.bean.Uuid;
 import retrofit2.http.*;
 import rx.Observable;
 
+import java.util.Map;
+
 public interface RetrofitService {
 
     /**
@@ -34,10 +36,11 @@ public interface RetrofitService {
 
     /**
      * 盘点数据接口，扫描后上传（post）
-     * @param upload
-     * @return
+     * @param token 登陆凭证
+     * @param map 参数
+     * @return ResponseObject
      */
     @POST("api/stocking/rfidAdd")
-    Observable<ResponseObject> rfidAdd(@Body Upload upload);
+    Observable<ResponseObject> rfidAdd(@Header("token") String token,@QueryMap Map<String, Object> map);
 
 }

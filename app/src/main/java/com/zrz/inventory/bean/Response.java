@@ -36,7 +36,7 @@ public class Response implements Serializable {
      */
     private String inventory_area;
     /**
-     * 匹配状态 4
+     * 匹配状态 1、未匹配，2、匹配不合格，3、新增，4、匹配符合
      */
     private String match_state;
     /**
@@ -113,8 +113,24 @@ public class Response implements Serializable {
         this.inventory_area = inventory_area;
     }
 
+    /**
+     * 1、未匹配，2、匹配不合格，3、新增，4、匹配符合
+     * @return
+     */
     public String getMatch_state() {
-        return match_state;
+
+        switch (match_state){
+            case "1":
+                return "未匹配";
+            case "2":
+                return "匹配不合格";
+            case "3":
+                return "新增";
+            case "4":
+                return "匹配符合";
+            default:
+                    return "";
+        }
     }
 
     public void setMatch_state(String match_state) {

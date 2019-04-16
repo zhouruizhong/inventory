@@ -44,7 +44,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
     private List<Receipts> receiptsList = new ArrayList<>();
     private ViewListAdapter viewListAdapter;
     private Integer currentPage = 1;
-    private Integer pageSize = 5;
+    private Integer pageSize = 10;
     private LoadListView listView;
 
     @Override
@@ -78,6 +78,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
         viewListAdapter = new ViewListAdapter(this, receiptsList);
         listView.setAdapter(viewListAdapter);
         listView.setSelection(1);
+        listView.setEmptyView(findViewById(R.id.receipts_no_data));
     }
 
     public class ButtonOnClickListener implements View.OnClickListener {
@@ -137,7 +138,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                view.setBackgroundColor(getResources().getColor(R.color.blue3));
+                //view.setBackgroundColor(getResources().getColor(R.color.blue3));
                 //获取选择的项的值
                 Receipts receipts = (Receipts) parent.getItemAtPosition(position);
                 Bundle bundle = new Bundle();
@@ -158,13 +159,25 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
                 receiptsList.addAll(receipts);
                 viewListAdapter.notifyDataSetChanged();
             } else {
-                Toast.makeText(this, "我是有底线的!", Toast.LENGTH_SHORT).show();
+                if (currentPage > 1){
+                    Toast.makeText(this, "我是有底线的!", Toast.LENGTH_SHORT).show();
+                }
             }
+        }
+
+        if(tag.equals("refresh")){
+                List<Receipts> receipts = (List<Receipts>) response.get("receiptsList");
+                receiptsList.clear();
+                receiptsList.addAll(receipts);
+                viewListAdapter.notifyDataSetChanged();
         }
 
         if (tag.equals("save")) {
             Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
-            //presenter.findAll(currentPage, pageSize);
+            if (receiptsList.size() >= pageSize){
+                currentPage++;
+            }
+            presenter.refresh(currentPage, pageSize);
         }
     }
 
@@ -185,15 +198,15 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                currentPage = currentPage + 1;
+                currentPage ++;
                 presenter.findAll(currentPage, pageSize);
                 //通知listView显示更新,加载完毕
 
                 /**
                  * 设置默认显示为Listview最后一行
                  */
-                listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-                listView.setStackFromBottom(true);
+                //listView.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+                //listView.setStackFromBottom(true);
                 //通知listView加载完毕，底部布局消失
                 listView.loadComplete();
             }

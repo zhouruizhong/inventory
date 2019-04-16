@@ -1,6 +1,7 @@
 package com.zrz.inventory.view;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Handler;
@@ -41,8 +42,9 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
     private List<Receipts> receiptsList = new ArrayList<>();
     private ViewListAdapter viewListAdapter;
     private List<Integer> indexs = new ArrayList<>(10);
+    private List<Integer> positions = new ArrayList<>(10);
     private Integer currentPage = 1;
-    private Integer pageSize = 5;
+    private Integer pageSize = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,22 +73,24 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
         viewListAdapter = new ViewListAdapter(this, receiptsList);
         listView.setAdapter(viewListAdapter);
         listView.setSelection(1);
+        listView.setEmptyView(findViewById(R.id.clean_no_data));
     }
 
     public void event() {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //获取选择的项的值
-                Receipts receipts = (Receipts) parent.getItemAtPosition(position);
-                if (null != indexs && indexs.contains(receipts.getId())) {
+                Receipts receipts = (Receipts) listView.getItemAtPosition(position);
+                if (positions.contains(position)) {
                     indexs.remove(receipts.getId());
+                    positions.remove((Integer) position);
                     view.setBackgroundColor(0);
                 } else {
                     indexs.add(receipts.getId());
+                    positions.add(position);
                     view.setBackgroundColor(getResources().getColor(R.color.blue3));
-                    //viewListAdapter.notifyDataSetChanged();
                 }
+                viewListAdapter.notifyDataSetInvalidated();
             }
         });
 
@@ -100,6 +104,7 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final List<Integer> selectList = viewListAdapter.getSelectList();
                 if (indexs.size() == 0) {
                     Toast.makeText(Clean.this, "请您先选中一行！", Toast.LENGTH_SHORT).show();
                 } else {
@@ -127,10 +132,36 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
             }
         });
 
+        /**
+         * 全选
+         */
         checkAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                indexs = new ArrayList<>(10);
+                if (positions.size() < receiptsList.size()) {
+                    int count = viewListAdapter.getCount();
+                    for (int i = 0; i < count; i++) {
+                        if (!positions.contains((Integer) i)) {
+                            positions.add(i);
+                            indexs.add(receiptsList.get(i).getId());
+                            View view = getViewByPosition(i, listView);
+                            view.setBackgroundColor(getResources().getColor(R.color.blue3));
+                        }
+                    }
+                    viewListAdapter.notifyDataSetInvalidated();
+                    return;
+                }
+
+                if (positions.size() == receiptsList.size()) {
+                    for (Integer integer : positions) {
+                        View view = getViewByPosition(integer, listView);
+                        view.setBackgroundColor(0);
+                    }
+                    positions.clear();
+                    indexs.clear();
+                    viewListAdapter.notifyDataSetInvalidated();
+                    return;
+                }
             }
         });
     }
@@ -143,12 +174,59 @@ public class Clean extends Activity implements ViewReceipts, LoadListView.ILoadL
                 receiptsList.addAll(receipts);
                 viewListAdapter.notifyDataSetChanged();
             } else {
-                Toast.makeText(this, "没有更多了!", Toast.LENGTH_SHORT).show();
+                if (currentPage > 1) {
+                    Toast.makeText(this, "没有更多了!", Toast.LENGTH_SHORT).show();
+                    viewListAdapter.notifyDataSetChanged();
+                }else{
+                    Toast.makeText(this, "您还没有添加数据!", Toast.LENGTH_SHORT).show();
+                }
             }
         }
+
+        if (tag.equals("refresh")) {
+            List<Receipts> receipts = (List<Receipts>) response.get("receiptsList");
+            receiptsList.clear();
+            receiptsList.addAll(receipts);
+            viewListAdapter.notifyDataSetChanged();
+        }
+
         if (tag.equals("delete")) {
             Toast.makeText(this, (String) response.get("message"), Toast.LENGTH_SHORT).show();
-            presenter.findAll(currentPage, pageSize);
+
+            List<Receipts> removeList = new ArrayList<>(10);
+            List<Integer> ids = (List<Integer>) response.get("id");
+            for (Receipts receipts : receiptsList) {
+                int id = receipts.getId();
+                for (int integer : ids) {
+                    if (id == integer) {
+                        removeList.add(receipts);
+                    }
+                }
+            }
+            for (Receipts receipts : removeList) {
+                receiptsList.remove(receipts);
+            }
+            viewListAdapter.notifyDataSetChanged();
+            //presenter.refresh(currentPage, pageSize);
+        }
+    }
+
+    /**
+     * 获取listView中item的布局
+     *
+     * @param pos      位置
+     * @param listView listView
+     * @return
+     */
+    private View getViewByPosition(int pos, ListView listView) {
+        final int firstListItemPosition = listView.getFirstVisiblePosition();
+        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+        if (pos < firstListItemPosition || pos > lastListItemPosition) {
+            return listView.getAdapter().getView(pos, null, listView);
+        } else {
+            final int childIndex = pos - firstListItemPosition;
+            return listView.getChildAt(childIndex);
         }
     }
 
