@@ -78,16 +78,6 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         event();
     }
 
-    @Override
-    public void initUHF() {
-        try {
-            mReader = RFIDWithUHF.getInstance();
-        } catch (Exception ex) {
-            toastMessage(ex.getMessage());
-            return;
-        }
-    }
-
     protected void initData() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -331,6 +321,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
                 String code = response.getCode();
                 String rfidData = response.getRfid_data();
                 if ("200".equals(code) && rfidData.equals(item4)) {
+                    receiptsDetail.setReceiptsId(receiptsId);
                     receiptsDetail.setItem1(response.getContainer_num() + "-" +response.getPacket_num());
                     receiptsDetail.setItem2(response.getNew_area());
                     receiptsDetail.setItem3(response.getMatch_state());
@@ -338,6 +329,15 @@ public class Scan extends Base implements ViewReceipts, UploadView {
                 }
             }
         }
+
+        ReceiptsDetail receiptsDetail = new ReceiptsDetail();
+        receiptsDetail.setItem1("1-2" + "-"  + "3");
+        receiptsDetail.setItem2("12135");
+        receiptsDetail.setItem3("已匹配");
+        receiptsDetail.setReceiptsId(receiptsId);
+        receiptsDetail.setItem4("12345678910");
+        receiptsDetailList.add(receiptsDetail);
+
         if (receiptsDetailList.size() > 0){
             presenter.batchAdd(receiptsId, receiptsDetailList);
         }
@@ -520,12 +520,15 @@ public class Scan extends Base implements ViewReceipts, UploadView {
             if (event.getRepeatCount() == 0) {
                 readTag();
             }
+            if (event.getRepeatCount() == 1) {
+                stopInventory();
+            }
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
 
-    @Override
+    /*@Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == 139 ||keyCode == 280) {
             if (event.getRepeatCount() == 0) {
@@ -534,7 +537,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
             return true;
         }
         return super.onKeyUp(keyCode, event);
-    }
+    }*/
 
     private Handler handler = new Handler() {
         @Override

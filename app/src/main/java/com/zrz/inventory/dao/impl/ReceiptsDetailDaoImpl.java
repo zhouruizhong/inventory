@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import com.zrz.inventory.bean.Receipts;
 import com.zrz.inventory.bean.ReceiptsDetail;
 import com.zrz.inventory.dao.ReceiptsDetailDao;
@@ -36,7 +37,8 @@ public class ReceiptsDetailDaoImpl implements ReceiptsDetailDao {
         values.put("item2", receiptsDetail.getItem2());
         values.put("item3", receiptsDetail.getItem3());
         values.put("item4", receiptsDetail.getItem4());
-        database.insert("receipts_detail", null, values);
+        long add = database.insert("receipts_detail", null, values);
+        Log.d("receipts_detail_add", add == 1 ? "添加成功" : "添加失败");
     }
 
     @Override

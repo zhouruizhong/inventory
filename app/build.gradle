@@ -58,5 +58,5 @@ dependencies {
 
 
     implementation files('libs/xUtils-2.5.5.jar')
-    implementation files('libs/deviceapi(20180201).jar')
+    implementation files("libs/deviceapi20190214.jar")
 }

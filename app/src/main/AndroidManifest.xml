@@ -3,6 +3,7 @@
           package="com.zrz.inventory">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
             android:allowBackup="true"
@@ -11,7 +12,7 @@
             android:roundIcon="@mipmap/log"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".view.Index">
+        <activity android:name=".view.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -22,7 +23,7 @@
         <activity android:name=".view.Register"/>
         <activity android:name=".view.ScanReceipts"/>
         <activity android:name=".view.Inventory"/>
-        <activity android:name=".view.Main"/>
+        <activity android:name=".view.Index"/>
         <activity android:name=".view.Scan"/>
         <activity android:name=".view.Clean"/>
         <activity

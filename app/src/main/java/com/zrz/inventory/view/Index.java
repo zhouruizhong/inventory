@@ -46,7 +46,7 @@ public class Index extends Base implements UuidView {
 
         //初始化控件
         initView();
-        initUHF();
+        //initUHF();
         //初始化事件
         event();
 

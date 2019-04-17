@@ -8,9 +8,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 import com.rscja.deviceapi.RFIDWithUHF;
+import com.rscja.deviceapi.exception.ConfigurationException;
 import com.rscja.utility.StringUtility;
 import com.zrz.inventory.adapter.ViewPagerAdapter;
 import com.zrz.inventory.fragment.BaseTabFragmentActivity;
@@ -115,6 +117,13 @@ public class Base extends Activity {
 
         @Override
         protected Boolean doInBackground(String... params) {
+            if (mReader == null) {
+                try {
+                    mReader = RFIDWithUHF.getInstance();
+                } catch (ConfigurationException e) {
+                    e.printStackTrace();
+                }
+            }
             return mReader.init();
         }
 
@@ -122,8 +131,12 @@ public class Base extends Activity {
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             if (!result) {
+                Log.e("DeviceAPI", "onPostExecute:   " + result );
                 Toast.makeText(Base.this, "init fail",
                         Toast.LENGTH_SHORT).show();
+            }
+            if (result){
+                mReader.setPower(30);
             }
         }
 

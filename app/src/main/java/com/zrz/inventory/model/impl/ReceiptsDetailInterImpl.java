@@ -34,8 +34,8 @@ public class ReceiptsDetailInterImpl implements ReceiptsDetailInter {
         }
     }
 
-    public Boolean isExist(Integer receiptsId, String rfidData){
-        return null == receiptsDetailDao.findByRfid(receiptsId, rfidData);
+    public boolean isExist(Integer receiptsId, String rfidData){
+        return null != receiptsDetailDao.findByRfid(receiptsId, rfidData);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ReceiptsDetailInterImpl implements ReceiptsDetailInter {
             int match = 0;
             for (ReceiptsDetail receiptsDetail : receiptsDetailList){
                 String rfidData = receiptsDetail.getItem4();
-                if (isExist(receiptsId, rfidData)){
+                if (!isExist(receiptsId, rfidData)){
                     receiptsDetailDao.add(receiptsDetail);
                     match++;
                 }
