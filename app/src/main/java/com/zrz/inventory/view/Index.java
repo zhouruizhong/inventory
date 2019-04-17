@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.rscja.deviceapi.RFIDWithUHF;
 import com.zrz.inventory.R;
 import com.zrz.inventory.bean.LoginResp;
 import com.zrz.inventory.bean.Uuid;
@@ -25,13 +26,14 @@ import com.zrz.inventory.view.viewinter.UuidView;
 import java.io.IOException;
 import java.net.URL;
 
-public class Index extends Activity implements UuidView {
+public class Index extends Base implements UuidView {
 
     private static final String TAG = "Rxjava";
     private ImageView qrCode;
     private TextView txInvalid;
     private TextView txScan;
     private Button btnRefresh;
+    public RFIDWithUHF mReader;
     private IndexPresenter presenter;
     private String uuid;
 
@@ -44,6 +46,7 @@ public class Index extends Activity implements UuidView {
 
         //初始化控件
         initView();
+        initUHF();
         //初始化事件
         event();
 
@@ -165,5 +168,45 @@ public class Index extends Activity implements UuidView {
             e.printStackTrace();
         }
         return pngBM;
+    }
+
+    @Override
+    public void initUHF() {
+        try {
+            mReader = RFIDWithUHF.getInstance();
+        } catch (Exception ex) {
+            toastMessage(ex.getMessage());
+            return;
+        }
+        if (mReader != null) {
+            new InitTask().execute();
+        }
+    }
+
+    @Override
+    public void toastMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    public class InitTask extends AsyncTask<String, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            return mReader.init();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (!result) {
+                Toast.makeText(Index.this, "init fail",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
     }
 }
