@@ -86,4 +86,24 @@ public class ReceiptsDetailDaoImpl implements ReceiptsDetailDao {
         cursor.close();
         return list;
     }
+
+    @Override
+    public List<ReceiptsDetail> find(Integer receiptsId) {
+        List<ReceiptsDetail> list = new ArrayList<>(10);
+        database = dbHelper.getReadableDatabase();
+        Cursor cursor = database.query("receipts_detail", new String[]{"id", "receipts","item1","item2","item3", "item4"}, "receipts = ?", new String[]{receiptsId.toString()}, null, null, null, null);
+        ReceiptsDetail detail = null;
+        while(cursor.moveToNext()){
+            detail = new ReceiptsDetail();
+            detail.setReceiptsId(cursor.getInt(cursor.getColumnIndex("receipts")));
+            detail.setItem1(cursor.getString(cursor.getColumnIndex("item1")));
+            detail.setItem2(cursor.getString(cursor.getColumnIndex("item2")));
+            detail.setItem3(cursor.getString(cursor.getColumnIndex("item3")));
+            detail.setItem4(cursor.getString(cursor.getColumnIndex("item4")));
+            detail.setId(cursor.getInt(cursor.getColumnIndex("id")));
+            list.add(detail);
+        }
+        cursor.close();
+        return list;
+    }
 }

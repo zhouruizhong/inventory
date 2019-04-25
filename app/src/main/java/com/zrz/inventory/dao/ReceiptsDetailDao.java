@@ -27,4 +27,10 @@ public interface ReceiptsDetailDao {
      * @return
      */
     List<ReceiptsDetail> find(Integer receiptsId, Integer currentPage, Integer pageSize);
+
+    /**
+     *
+     * @return
+     */
+    List<ReceiptsDetail> find(Integer receiptsId);
 }

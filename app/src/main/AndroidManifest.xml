@@ -11,8 +11,9 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/log"
             android:supportsRtl="true"
+            android:alwaysRetainTaskState="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".view.Main">
+        <activity android:name=".view.Index">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -23,7 +24,7 @@
         <activity android:name=".view.Register"/>
         <activity android:name=".view.ScanReceipts"/>
         <activity android:name=".view.Inventory"/>
-        <activity android:name=".view.Index"/>
+        <activity android:name=".view.Main"/>
         <activity android:name=".view.Scan"/>
         <activity android:name=".view.Clean"/>
         <activity

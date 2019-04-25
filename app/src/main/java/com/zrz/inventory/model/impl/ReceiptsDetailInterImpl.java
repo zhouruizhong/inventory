@@ -68,4 +68,15 @@ public class ReceiptsDetailInterImpl implements ReceiptsDetailInter {
             listener.fail(new ArrayList<ReceiptsDetail>());
         }
     }
+
+    @Override
+    public void find(Integer receiptsId, OnRequestListener listener) {
+        try{
+
+            List<ReceiptsDetail> receiptsDetails = receiptsDetailDao.find(receiptsId);
+            listener.success(receiptsDetails);
+        }catch (Exception e){
+            listener.fail(new ArrayList<ReceiptsDetail>());
+        }
+    }
 }

@@ -25,4 +25,10 @@ public interface ReceiptsDetailInter {
      * @return
      */
     void find(Integer receiptsId, Integer currentPage, Integer pageSize, OnRequestListener listener);
+
+    /**
+     *
+     * @return
+     */
+    void find(Integer receiptsId, OnRequestListener listener);
 }

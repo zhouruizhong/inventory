@@ -37,7 +37,7 @@
     <string name="title_activity_scan_receipts">ScanReceipts</string>
     <string name="title_activity_clean">Clean</string>
     <string name="title_activity_invalid">Invalid</string>
-    <string name="invalid_code">二维码已失效</string>
+    <string name="invalid_code">二维码已失效，点击刷新</string>
     <string name="click_refresh">请点击刷新</string>
 
 </resources>

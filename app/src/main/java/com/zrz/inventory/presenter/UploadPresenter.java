@@ -76,7 +76,7 @@ public class UploadPresenter {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        mUploadView.onError("请求失败！！");
+                        mUploadView.onError("请求失败！");
                     }
 
                     @Override

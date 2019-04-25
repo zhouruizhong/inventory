@@ -20,6 +20,7 @@ import com.zrz.inventory.bean.LoginResp;
 import com.zrz.inventory.bean.Uuid;
 import com.zrz.inventory.presenter.CheckLoginPresenter;
 import com.zrz.inventory.presenter.IndexPresenter;
+import com.zrz.inventory.tools.StringUtils;
 import com.zrz.inventory.view.viewinter.LoginRespView;
 import com.zrz.inventory.view.viewinter.UuidView;
 
@@ -32,7 +33,6 @@ public class Index extends Base implements UuidView {
     private ImageView qrCode;
     private TextView txInvalid;
     private TextView txScan;
-    private Button btnRefresh;
     public RFIDWithUHF mReader;
     private IndexPresenter presenter;
     private String uuid;
@@ -44,6 +44,7 @@ public class Index extends Base implements UuidView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.index);
 
+        init();
         //初始化控件
         initView();
         //initUHF();
@@ -52,6 +53,16 @@ public class Index extends Base implements UuidView {
 
     }
 
+    private void init(){
+        SharedPreferences sharedPreferences = getSharedPreferences("login", Context.MODE_PRIVATE);
+        //(key,若无数据需要赋的值)
+        String loginUuid = sharedPreferences.getString("loginUuid", null);
+        if (StringUtils.isNotEmpty(loginUuid)){
+            loginPresenter.onCreate();
+            loginPresenter.attachView(mLoginRespView);
+            loginPresenter.checkLogin(loginUuid);
+        }
+    }
     private void event() {
         /**
          * 二维码点击时间
@@ -64,7 +75,6 @@ public class Index extends Base implements UuidView {
             }
         });
 
-
     }
 
     private void initView() {
@@ -72,7 +82,6 @@ public class Index extends Base implements UuidView {
         qrCode = findViewById(R.id.qr_code);
         txInvalid = findViewById(R.id.qr_code_invalid);
         txScan = findViewById(R.id.scan_tip);
-        btnRefresh = findViewById(R.id.qr_code_refresh);
         //建立与presenter层的关系，创建presenter对象
         presenter = new IndexPresenter(this, Index.this);
         presenter.onCreate();
@@ -87,7 +96,6 @@ public class Index extends Base implements UuidView {
         qrCode.setVisibility(View.VISIBLE);
         txScan.setVisibility(View.VISIBLE);
         txInvalid.setVisibility(View.GONE);
-        btnRefresh.setVisibility(View.GONE);
 
         System.out.println("-----------uuid :" + uuid + ":----------------");
         // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
@@ -102,7 +110,8 @@ public class Index extends Base implements UuidView {
     public void onError(String result) {
         Toast.makeText(this, "获取uuid超时,请检查网络！", Toast.LENGTH_SHORT).show();
         txScan.setVisibility(View.GONE);
-        btnRefresh.setVisibility(View.VISIBLE);
+        qrCode.setVisibility(View.GONE);
+        txInvalid.setVisibility(View.VISIBLE);
     }
 
     private LoginRespView mLoginRespView = new LoginRespView() {
@@ -130,7 +139,6 @@ public class Index extends Base implements UuidView {
                 qrCode.setVisibility(View.GONE);
                 txScan.setVisibility(View.GONE);
                 txInvalid.setVisibility(View.VISIBLE);
-                btnRefresh.setVisibility(View.VISIBLE);
             }
             Toast.makeText(Index.this, "抱歉,登陆失败或您还没有登陆：" + result, Toast.LENGTH_LONG).show();
         }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -54,6 +55,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
     private ListView listView;
 
     private List<ReceiptsDetail> receiptsDetails = new ArrayList<>();
+    private List<ReceiptsDetail> receiptsDetailList = new ArrayList<>();
     private ViewPagerAdapter viewPagerAdapter;
     private Integer currentPage = 1;
     private Integer pageSize = 10;
@@ -78,6 +80,19 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         event();
     }
 
+    public class ScanTask extends AsyncTask<Integer, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Integer... integers) {
+            try {
+                presenter.find(receiptsId);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
+
     protected void initData() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -87,8 +102,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         count.setText("0");
         matched.setText(receipts.getMatched());
 
-        //receiptsDetails.add(new ReceiptsDetail());
-        //presenter.find(receiptsId, currentPage, pageSize);
+        presenter.find(receiptsId);
     }
 
     @Override
@@ -185,6 +199,13 @@ public class Scan extends Base implements ViewReceipts, UploadView {
             }
         }
 
+        if (tag.equals("findAll")) {
+            List<ReceiptsDetail> list = (List<ReceiptsDetail>) response.get("receiptsDetailList");
+            if (list.size() > 0) {
+                receiptsDetailList.addAll(list);
+            }
+        }
+
         if (tag.equals("refresh")) {
             List<ReceiptsDetail> receiptsDetailList = (List<ReceiptsDetail>) response.get("receiptsDetailList");
             if (receiptsDetailList.size() > 0) {
@@ -253,7 +274,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
                 map.remove("jhSecret");
                 map.put("jhKey", keyName);
                 uploadPresenter.rfidAdd(token, map);
-            }else {
+            } else {
                 Toast.makeText(Scan.this, "请先扫描标签", Toast.LENGTH_LONG).show();
             }
         }
@@ -322,7 +343,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
                 String rfidData = response.getRfid_data();
                 if ("200".equals(code) && rfidData.equals(item4)) {
                     receiptsDetail.setReceiptsId(receiptsId);
-                    receiptsDetail.setItem1(response.getContainer_num() + "-" +response.getPacket_num());
+                    receiptsDetail.setItem1(response.getContainer_num() + "-" + response.getPacket_num());
                     receiptsDetail.setItem2(response.getNew_area());
                     receiptsDetail.setItem3(response.getMatch_state());
                     receiptsDetailList.add(receiptsDetail);
@@ -330,15 +351,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
             }
         }
 
-        ReceiptsDetail receiptsDetail = new ReceiptsDetail();
-        receiptsDetail.setItem1("1-2" + "-"  + "3");
-        receiptsDetail.setItem2("12135");
-        receiptsDetail.setItem3("已匹配");
-        receiptsDetail.setReceiptsId(receiptsId);
-        receiptsDetail.setItem4("12345678910");
-        receiptsDetailList.add(receiptsDetail);
-
-        if (receiptsDetailList.size() > 0){
+        if (receiptsDetailList.size() > 0) {
             presenter.batchAdd(receiptsId, receiptsDetailList);
         }
     }
@@ -406,16 +419,24 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         stopInventory();
     }
 
+    public boolean isExist(String item4) {
+        for (ReceiptsDetail receiptsDetail : receiptsDetailList) {
+            String rfidData = receiptsDetail.getItem4();
+            return rfidData.equals(item4);
+        }
+        return false;
+    }
+
     /**
      * 添加EPC到列表中
      *
      * @param epc
      */
     private void addEPCToList(String epc, String rssi) {
-        if (!TextUtils.isEmpty(epc)) {
+        if (!TextUtils.isEmpty(epc) && !isExist(epc)) {
             int index = checkIsExist(epc);
 
-            map = new HashMap<String, String>();
+            map = new HashMap<>(16);
             map.put("tagUii", epc);
             map.put("tagCount", String.valueOf(1));
             map.put("tagRssi", rssi);
@@ -516,7 +537,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == 139 ||keyCode == 280) {
+        if (keyCode == 139 || keyCode == 280) {
             if (event.getRepeatCount() == 0) {
                 readTag();
             }

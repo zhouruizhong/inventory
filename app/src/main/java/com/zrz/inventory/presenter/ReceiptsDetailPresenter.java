@@ -66,6 +66,36 @@ public class ReceiptsDetailPresenter {
         });
     }
 
+    public void find(Integer receiptsId){
+        modelInter.find(receiptsId, new OnRequestListener(){
+            @Override
+            public void success(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsDetailList", (List<ReceiptsDetail>)object);
+                        viewReceipts.successHint(response,"findAll");
+                    }
+                }, 500);
+            }
+
+            @Override
+            public void fail(final Object object) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<String, Object> response = new HashMap<>(16);
+                        response.put("receiptsDetailList", (List<ReceiptsDetail>)object);
+                        viewReceipts.successHint(response,"findAll");
+                    }
+                }, 500);
+            }
+        });
+    }
+
     public void refresh(Integer receiptsId, Integer currentPage, Integer pageSize){
         modelInter.find(receiptsId, currentPage, pageSize, new OnRequestListener(){
             @Override
