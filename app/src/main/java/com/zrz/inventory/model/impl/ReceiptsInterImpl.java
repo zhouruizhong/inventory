@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  * @author 周瑞忠
- * @description java类作用描述
  * @date 2019/3/31 2:00
  */
 public class ReceiptsInterImpl implements ReceiptsInter {
@@ -83,6 +83,16 @@ public class ReceiptsInterImpl implements ReceiptsInter {
             receiptsDao.updateCountById(id, count);
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Receipts find(Integer id) {
+        try{
+            return receiptsDao.findById(id);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
     }
 

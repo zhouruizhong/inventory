@@ -13,7 +13,6 @@ import java.util.List;
 
 /**
  * @author 周瑞忠
- * @description java类作用描述
  * @date 2019/3/31 1:59
  */
 public interface ReceiptsInter {
@@ -52,6 +51,12 @@ public interface ReceiptsInter {
      * @param count
      */
     void updateCountById(Integer id, Integer count);
+
+    /**
+     *
+     * @param id
+     */
+    Receipts find(Integer id);
 
     /**
      *

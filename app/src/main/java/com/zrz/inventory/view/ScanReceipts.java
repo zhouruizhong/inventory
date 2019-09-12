@@ -174,7 +174,7 @@ public class ScanReceipts extends Activity implements ViewReceipts, LoadListView
 
         if (tag.equals("save")) {
             Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
-            if (receiptsList.size() >= pageSize){
+            if (receiptsList.size() > pageSize){
                 currentPage++;
             }
             presenter.refresh(currentPage, pageSize);

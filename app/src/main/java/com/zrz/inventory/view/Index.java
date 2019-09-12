@@ -29,7 +29,7 @@ import java.net.URL;
 
 public class Index extends Base implements UuidView {
 
-    private static final String TAG = "Rxjava";
+    private static final String TAG = "Index";
     private ImageView qrCode;
     private TextView txInvalid;
     private TextView txScan;
@@ -47,9 +47,8 @@ public class Index extends Base implements UuidView {
         init();
         //初始化控件
         initView();
-        //initUHF();
-        //初始化事件
         event();
+        //initUHF();
 
     }
 
@@ -63,6 +62,7 @@ public class Index extends Base implements UuidView {
             loginPresenter.checkLogin(loginUuid);
         }
     }
+
     private void event() {
         /**
          * 二维码点击时间
@@ -127,8 +127,7 @@ public class Index extends Base implements UuidView {
                 editor.putString("secretName", mLoginResp.getSecretName());
                 editor.putString("token", mLoginResp.getToken());
                 editor.putString("loginUuid", mLoginResp.getLoginUuid());
-                editor.commit();
-
+                editor.apply();
                 startActivity(intent);
             }
         }

@@ -15,6 +15,7 @@ public interface ReceiptsDetailInter {
 
     /**
      *
+     * @param receiptsId
      * @param receiptsDetailList
      * @param listener
      */
@@ -22,13 +23,17 @@ public interface ReceiptsDetailInter {
 
     /**
      *
-     * @return
+     * @param receiptsId
+     * @param currentPage
+     * @param pageSize
+     * @param listener
      */
     void find(Integer receiptsId, Integer currentPage, Integer pageSize, OnRequestListener listener);
 
     /**
      *
-     * @return
+     * @param receiptsId
+     * @param listener
      */
     void find(Integer receiptsId, OnRequestListener listener);
 }

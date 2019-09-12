@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -53,15 +52,15 @@ public class Base extends Activity {
     }
 
     public void initUHF() {
-            try {
-                mReader = RFIDWithUHF.getInstance();
-            } catch (Exception ex) {
-                toastMessage(ex.getMessage());
-                return;
-            }
-            if (mReader != null) {
-                new InitTask().execute();
-            }
+        try {
+            mReader = RFIDWithUHF.getInstance();
+        } catch (Exception ex) {
+            toastMessage(ex.getMessage());
+            return;
+        }
+        if (mReader != null) {
+            new InitTask().execute();
+        }
     }
 
     protected void initViewPageData() {

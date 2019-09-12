@@ -166,12 +166,14 @@ public class ReceiptsDetailPresenter {
         modelInter.batchAdd(receiptsId, receiptsDetailList, new OnRequestListener() {
             @Override
             public void success(final Object object) {
+                final Receipts receipts = receiptsInter.find(receiptsId);
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         Map<String, Object> response = new HashMap<>(16);
                         response.put("message", "匹配成功");
+                        response.put("receipts", receipts);
                         //返回成功状态信息
                         viewReceipts.successHint(response,"batch");
                     }
@@ -186,6 +188,7 @@ public class ReceiptsDetailPresenter {
                     public void run() {
                         Map<String, Object> response = new HashMap<>(16);
                         response.put("message", "匹配失败");
+                        response.put("receipts", null);
                         //返回失败状态信息
                         viewReceipts.failHint(response,"batch");
                     }

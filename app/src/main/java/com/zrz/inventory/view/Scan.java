@@ -22,18 +22,23 @@ import com.zrz.inventory.fragment.BaseTabFragmentActivity;
 import com.zrz.inventory.fragment.KeyDwonFragment;
 import com.zrz.inventory.presenter.ReceiptsDetailPresenter;
 import com.zrz.inventory.presenter.UploadPresenter;
+import com.zrz.inventory.tools.JsonUtil;
 import com.zrz.inventory.tools.MD5Util;
 import com.zrz.inventory.tools.StringUtils;
 import com.zrz.inventory.tools.UIHelper;
 import com.zrz.inventory.view.viewinter.UploadView;
 import com.zrz.inventory.view.viewinter.ViewReceipts;
 import com.zrz.inventory.widget.LoadListView;
+import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.util.*;
 
 public class Scan extends Base implements ViewReceipts, UploadView {
 
+    private static final String TAG = "Scan";
     private boolean loopFlag = false;
     private int inventoryFlag = 1;
 
@@ -71,7 +76,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         // 初始化页面
         initView();
         initSound();
-        initUHF();
+        //initUHF();
         initData();
         initViewPager();
         //initViewPageData();
@@ -80,20 +85,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         event();
     }
 
-    public class ScanTask extends AsyncTask<Integer, Integer, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Integer... integers) {
-            try {
-                presenter.find(receiptsId);
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-    }
-
-    protected void initData() {
+    private void initData() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         Receipts receipts = (Receipts) bundle.getSerializable("receipts");
@@ -125,11 +117,18 @@ public class Scan extends Base implements ViewReceipts, UploadView {
     private AudioManager am;
 
     private void initSound() {
-        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 5);
-        soundMap.put(1, soundPool.load(this, R.raw.barcodebeep, 1));
-        soundMap.put(2, soundPool.load(this, R.raw.serror, 1));
-        // 实例化AudioManager对象
-        am = (AudioManager) this.getSystemService(AUDIO_SERVICE);
+        if (null == soundPool) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                soundPool = new SoundPool.Builder().setMaxStreams(10).build();
+            } else {
+                soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 5);
+            }
+
+            soundMap.put(1, soundPool.load(this, R.raw.barcodebeep, 1));
+            soundMap.put(2, soundPool.load(this, R.raw.serror, 1));
+            // 实例化AudioManager对象
+            am = (AudioManager) this.getSystemService(AUDIO_SERVICE);
+        }
     }
 
     /**
@@ -143,16 +142,13 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         // 返回当前AudioManager对象的音量值
         float audioCurrentVolumn = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         volumnRatio = audioCurrentVolumn / audioMaxVolumn;
-        try {
-            // p2、左声道音量
-            // p3、右声道音量
-            // p4、优先级，0为最低
-            // p5、循环次数，0无不循环，-1无永远循环
-            // p6、回放速度 ，该值在0.5-2.0之间，1为正常速度
-            soundPool.play(soundMap.get(id), volumnRatio, volumnRatio, 1, 0, 1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        System.out.println("音量大小为：---" + volumnRatio + "--------------------------------------");
+        // p2、左声道音量
+        // p3、右声道音量
+        // p4、优先级，0为最低
+        // p5、循环次数，0无不循环，-1无永远循环
+        // p6、回放速度 ，该值在0.5-2.0之间，1为正常速度
+        soundPool.play(soundMap.get(id), volumnRatio, volumnRatio, 1, 0, 1);
     }
 
     private void initView() {
@@ -185,7 +181,9 @@ public class Scan extends Base implements ViewReceipts, UploadView {
 
     @Override
     public void successHint(Map<String, Object> response, String tag) {
-        if (tag.equals("find")) {
+        String t = "";
+        t = "find";
+        if (tag.equals(t)) {
             List<ReceiptsDetail> receiptsDetailList = (List<ReceiptsDetail>) response.get("receiptsDetailList");
             if (receiptsDetailList.size() > 0) {
                 receiptsDetails.addAll(receiptsDetailList);
@@ -199,14 +197,22 @@ public class Scan extends Base implements ViewReceipts, UploadView {
             }
         }
 
-        if (tag.equals("findAll")) {
+        t = "findAll";
+        if (tag.equals(t)) {
             List<ReceiptsDetail> list = (List<ReceiptsDetail>) response.get("receiptsDetailList");
             if (list.size() > 0) {
-                receiptsDetailList.addAll(list);
+                for (ReceiptsDetail receiptsDetail : list) {
+                    map = new HashMap<>(16);
+                    map.put("tagUii", receiptsDetail.getItem4());
+                    map.put("tagCount", String.valueOf(1));
+                    map.put("tagRssi", "N/A");
+                    tagList.add(map);
+                }
             }
         }
 
-        if (tag.equals("refresh")) {
+        t = "refresh";
+        if (tag.equals(t)) {
             List<ReceiptsDetail> receiptsDetailList = (List<ReceiptsDetail>) response.get("receiptsDetailList");
             if (receiptsDetailList.size() > 0) {
                 receiptsDetails.addAll(receiptsDetailList);
@@ -218,12 +224,19 @@ public class Scan extends Base implements ViewReceipts, UploadView {
             }
         }
 
-        if (tag.equals("scan")) {
+        t = "scan";
+        if (tag.equals(t)) {
             Toast.makeText(this, (String) response.get("message"), Toast.LENGTH_SHORT).show();
             if (receiptsDetails.size() >= pageSize) {
                 currentPage++;
             }
             presenter.refresh(receiptsId, currentPage, pageSize);
+        }
+
+        t = "batch";
+        if (t.equals(tag)) {
+            Receipts receipts = (Receipts) response.get("receipts");
+            matched.setText(receipts.getMatched());
         }
     }
 
@@ -288,7 +301,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
      *
      * @return
      */
-    public String createSign(Map<String, Object> map) {
+    private String createSign(Map<String, Object> map) {
         Object[] keyArr = sortMap(map);
         StringBuilder temp = new StringBuilder();
         for (int i = 0; i < keyArr.length; i++) {
@@ -299,7 +312,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         return sign.toUpperCase();
     }
 
-    public Object[] sortMap(Map<String, Object> map) {
+    private Object[] sortMap(Map<String, Object> map) {
         Set<String> keysSet = map.keySet();
         Object[] keys = keysSet.toArray();
         Arrays.sort(keys);
@@ -310,6 +323,8 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         @Override
         public void onSuccess(final ResponseObject object) {
             String code = object.getCode();
+            //String json = JsonUtil.toJson(object);
+            //Toast.makeText(Scan.this, json, Toast.LENGTH_LONG).show();
             if ("200".equals(code)) {
                 Toast.makeText(Scan.this, object.getMessage(), Toast.LENGTH_LONG).show();
                 Handler handler = new Handler();
@@ -334,8 +349,8 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         }
     };
 
-    public void load(List<Response> list) {
-        List<ReceiptsDetail> receiptsDetailList = new ArrayList<>(10);
+    private void load(List<Response> list) {
+        receiptsDetailList = new ArrayList<>(10);
         for (ReceiptsDetail receiptsDetail : receiptsDetails) {
             String item4 = receiptsDetail.getItem4();
             for (Response response : list) {
@@ -347,6 +362,13 @@ public class Scan extends Base implements ViewReceipts, UploadView {
                     receiptsDetail.setItem2(response.getNew_area());
                     receiptsDetail.setItem3(response.getMatch_state());
                     receiptsDetailList.add(receiptsDetail);
+
+                    tagList.clear();
+                    map = new HashMap<>(16);
+                    map.put("tagUii", rfidData);
+                    map.put("tagCount", String.valueOf(1));
+                    map.put("tagRssi", "N/A");
+                    tagList.add(map);
                 }
             }
         }
@@ -356,23 +378,32 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         }
     }
 
+    boolean isLoop = false;
+
     public class ScanClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            readTag();
-            /*ReceiptsDetail receiptsDetail = new ReceiptsDetail();
-            receiptsDetail.setReceiptsId(receiptsId);
-            receiptsDetail.setItem1("item1" + (int) (Math.random() * 10 + 1));
-            receiptsDetail.setItem2("item2" + (int) (Math.random() * 10 + 2));
-            receiptsDetail.setItem3("item3" + (int) (Math.random() * 10 + 3));
-            receiptsDetail.setItem4(""+System.currentTimeMillis() +""+ (Math.random() * 1000));
-            presenter.add(receiptsDetail);*/
+            for (int i = 1; i < 1000; i++) {
+                mContext.playSound(1);
+                System.out.println("------现在是第"+ i +"次扫描---------------------------------------");
+
+            }
+            //readTag();
         }
+    }
+
+    public void clear() {
+        receiptsDetails.clear();
+        listView.setAdapter(viewPagerAdapter);
+        count.setText("" + viewPagerAdapter.getCount());
     }
 
     private void readTag() {
         // 识别标签
         if (scan.getText().equals(this.getString(R.string.scan))) {
+            if (null != receiptsDetailList && receiptsDetailList.size() > 0) {
+                clear();
+            }
             scan.setText("扫描中....");
             switch (inventoryFlag) {
                 // 单步
@@ -385,6 +416,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
                     } else {
                         scan.setText(this.getString(R.string.scan));
                         UIHelper.toastMessage(this, R.string.uhf_msg_inventory_fail);
+                        mContext.playSound(2);
                     }
                 }
                 break;
@@ -399,6 +431,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
                         mContext.mReader.stopInventory();
                         scan.setText(this.getString(R.string.scan));
                         UIHelper.toastMessage(mContext, R.string.uhf_msg_inventory_open_fail);
+                        mContext.playSound(2);
                     }
                 }
                 break;
@@ -419,10 +452,12 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         stopInventory();
     }
 
-    public boolean isExist(String item4) {
+    private boolean isExist(String item4) {
         for (ReceiptsDetail receiptsDetail : receiptsDetailList) {
             String rfidData = receiptsDetail.getItem4();
-            return rfidData.equals(item4);
+            if (rfidData.equals(item4)) {
+                return true;
+            }
         }
         return false;
     }
@@ -433,7 +468,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
      * @param epc
      */
     private void addEPCToList(String epc, String rssi) {
-        if (!TextUtils.isEmpty(epc) && !isExist(epc)) {
+        if (!TextUtils.isEmpty(epc)) {
             int index = checkIsExist(epc);
 
             map = new HashMap<>(16);
@@ -441,26 +476,26 @@ public class Scan extends Base implements ViewReceipts, UploadView {
             map.put("tagCount", String.valueOf(1));
             map.put("tagRssi", rssi);
 
-            receiptsDetail = new ReceiptsDetail();
-            // 包号
-            receiptsDetail.setItem1("");
-            // 面积
-            receiptsDetail.setItem2("");
-            // 状态
-            receiptsDetail.setItem3("未匹配");
-            // rfid
-            receiptsDetail.setItem4(epc);
-
             if (index == -1) {
+                receiptsDetail = new ReceiptsDetail();
+                // 包号
+                receiptsDetail.setItem1("");
+                // 面积
+                receiptsDetail.setItem2("");
+                // 状态
+                receiptsDetail.setItem3("未匹配");
+                // rfid
+                receiptsDetail.setItem4(epc);
                 receiptsDetails.add(receiptsDetail);
                 tagList.add(map);
                 listView.setAdapter(viewPagerAdapter);
                 count.setText("" + viewPagerAdapter.getCount());
-            } else {
+            }
+            /*else {
                 int tagcount = Integer.parseInt(tagList.get(index).get("tagCount"), 10) + 1;
                 map.put("tagCount", String.valueOf(tagcount));
                 tagList.set(index, map);
-            }
+            }*/
             viewPagerAdapter.notifyDataSetChanged();
         }
     }
@@ -499,8 +534,7 @@ public class Scan extends Base implements ViewReceipts, UploadView {
         }
         String tempStr = "";
         for (int i = 0; i < tagList.size(); i++) {
-            HashMap<String, String> temp = new HashMap<String, String>();
-            temp = tagList.get(i);
+            HashMap<String, String> temp = tagList.get(i);
             tempStr = temp.get("tagUii");
             if (strEPC.equals(tempStr)) {
                 existFlag = i;
